@@ -1,11 +1,12 @@
 // ==UserScript==
-// @name          YouTube » XBMC
-// @namespace     http://userscripts.org/users/53793/scripts
-// @description   Play YouTube videos on your XBMC
-// @include       *youtube.tld/*
-// @version       1.0.2
-// @date          2012-07-11
-// @author        xlotlu
+// @name            YouTube » XBMC
+// @namespace       http://userscripts.org/users/53793/scripts
+// @description     Play YouTube videos on your XBMC
+// @include         *youtube.tld/*
+// @version         1.0.2
+// @date            2012-07-11
+// @author          xlotlu
+// @updateURL       http://userscripts.org/scripts/source/136934.meta.js
 // ==/UserScript==
 
 // the script will stop the currently playing video on youtube
