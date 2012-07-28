@@ -45,27 +45,227 @@ function get_video_id(url) {
     return match ? match[1] : null;
 }
 
+function status(type, response) {
+    console.log(type);
+    console.log(response);
+}
+
 function play(video_id) {
     var url = 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + video_id;
+
+    var command =  {
+        jsonrpc: "2.0",
+        method: "Player.Open",
+        params: {
+            item: {
+                file: url
+            }
+        },
+        id : 1
+    };
+    var command = [{
+        jsonrpc: "2.0",
+        method: "Playlist.Add",
+        params: {
+            item: {
+                file: url
+            },
+            playlistid: 1
+        },
+        id: 1
+    }/*,
+    {
+        jsonrpc: "2.0",
+        method: "Player.Open",
+        params: {
+            item: {
+                playlistid: 1,
+                position: 0
+            }
+        },
+        id : 2
+    }*/];
 
     var details = {
         method : 'POST',
         url : 'http://' + xbmc_address + '/jsonrpc',
         headers : {'Content-Type': 'application/json'},
-        data : JSON.stringify({
-            jsonrpc: "2.0",
-            method: "Player.Open",
-            params: {
-                item: {
-                    file: url
-                }
-            },
-            id : 1
-        })
+        data : JSON.stringify(command),
+        onabort : function (response){ status("onabort", response) },
+        onerror : function (response){ status("onerror", response) },
+        onload : function (response){ status("onload", response) },
+        onprogress : function (response){ status("onprogress", response) },
+        onreadystatechange : function (response){ status("onreadystatechange", response) },
+        ontimeout  : function (response){ status("ontimeout", response) }
     };
 
     GM_xmlhttpRequest(details);
 }
+
+
+/*
+Going playlisty:
+
+»»»
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "method": "Player.GetActivePlayers",
+    "params": {}
+}
+
+«««
+// if there is no active player:
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "result": []
+}
+// else
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "result": [
+        {
+            "playerid": 1,
+            "type": "video"
+        }
+    ]
+}
+
+
+»»»
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "method": "Player.GetProperties",
+    "params": {
+        "playerid": 1,
+        "properties": [
+            "playlistid",
+            "position",
+            "speed"
+        ]
+    }
+}
+
+«««
+// if the above said there's no player:
+{
+    "error": {
+        "code": -32100,
+        "message": "Failed to execute method."
+    },
+    "id": 1,
+    "jsonrpc": "2.0"
+}
+// else:
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "result": {
+        "playlistid": 1,
+        // when position is -1, a single video is playing,
+        // NOT the video playlist (id 1).
+        // NB: playlist positions start from 0.
+        "position": -1,
+        // speed 0: video stopped,
+        // speed 1: running
+        "speed": 0
+    }
+}
+
+
+The user can:
+
+1. Add to playlist.
+Default action. The item is appended.
+
+»»»
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "method": "Playlist.Add",
+    "params": {
+        "playlistid": 1
+        "item": {
+            "file": "..."
+        }
+    }
+}
+
+2. Enqueue.
+Must find another name. The item is inserted after the now-playing.
+(i.e. the position result from above)
+
+»»»
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "method": "Playlist.Insert",
+    "params": {
+        "item": {
+            "file": "..."
+        },
+        "playlistid": 1,
+        "position": 1
+    }
+}
+
+3. Play.
+Gets inserted as above, but also:
+
+»»»
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "method": "Player.GoNext",
+    "params": {
+        "playerid": 1
+    }
+}
+
+
+We'll need to decide when to Player.Open "playlistid": 1 at what position.
+
+
+This might be needed:
+
+»»»
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "method": "Playlist.GetItems",
+    "params": {
+        "playlistid": 1
+    }
+}
+
+«««
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "result": {
+        "items": [
+            {
+                "label": "something something",
+                "type": "movie"
+            },
+            {
+                "label": "",
+                "type": "unknown"
+            }
+        ],
+        "limits": {
+            "end": 2,
+            "start": 0,
+            "total": 2
+        }
+    }
+}
+
+*/
+
 
 // part 1: are we on a listing page?
 var thumbs = document.getElementsByClassName('ux-thumb-wrap');
