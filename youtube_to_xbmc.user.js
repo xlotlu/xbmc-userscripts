@@ -63,6 +63,7 @@ function play(video_id) {
         },
         id : 1
     };
+    /*
     var command = [{
         jsonrpc: "2.0",
         method: "Playlist.Add",
@@ -73,7 +74,7 @@ function play(video_id) {
             playlistid: 1
         },
         id: 1
-    }/*,
+    },
     {
         jsonrpc: "2.0",
         method: "Player.Open",
@@ -84,7 +85,8 @@ function play(video_id) {
             }
         },
         id : 2
-    }*/];
+    }];
+    */
 
     var details = {
         method : 'POST',
@@ -164,10 +166,12 @@ Going playlisty:
     "id": 1,
     "jsonrpc": "2.0",
     "result": {
+        // playlistid 1 is the video playlist,
+        // it will always be the one playing if a video is playing.
         "playlistid": 1,
         // when position is -1, a single video is playing,
         // NOT the video playlist (id 1).
-        // NB: playlist positions start from 0.
+        // NB: normal playlist positions start from 0.
         "position": -1,
         // speed 0: video stopped,
         // speed 1: running
