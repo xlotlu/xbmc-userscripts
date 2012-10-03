@@ -3,7 +3,7 @@
   xmlns="http://www.w3.org/2000/svg"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   version="1.1"
-  width="140"
+  width="160"
   height="43">
   <defs>
     <g
@@ -25,6 +25,9 @@
     <path
       id="replace"
       d="M 2,3 3.5,5 5,3 7,5 5,6.5 7,8 5,10 3.5,8 2,10 0,8 2,6.5 0,5 z" />
+    <path
+      id="arrow"
+      d="m 2,4 8,0 -4,4 z" />
 
     <g
       id="play-add">
@@ -73,6 +76,9 @@
       <use
         x="120"
         xlink:href="#play-replace" />
+      <use
+        x="140"
+        xlink:href="#arrow" />
     </g>
   </defs>
   <use
@@ -101,5 +107,8 @@
       <use
         xlink:href="#play-replace"
         transform="matrix(0.84615385,0,0,0.84615385,120,0)" />
+      <use
+        xlink:href="#arrow"
+        transform="matrix(0.84615385,0,0,0.84615385,140,0)" />
   </g>
 </svg>
