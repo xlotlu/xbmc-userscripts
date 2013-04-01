@@ -3,6 +3,7 @@
 // @namespace       http://userscripts.org/users/53793/scripts
 // @description     Play YouTube videos on your XBMC
 // @include         *youtube.tld/*
+// @include         file:///home/john/Work/youtube-xbmc-js/*
 // @version         1.0.2
 // @date            2012-07-11
 // @author          xlotlu
@@ -45,9 +46,11 @@ function get_video_id(url) {
     return match ? match[1] : null;
 }
 
+var debug = true;
 function status(type, response) {
-    console.log(type);
-    console.log(response);
+    if (debug) {
+        console.log(type, JSON.parse(response.responseText));
+    }
 }
 
 function play(video_id) {
@@ -101,12 +104,129 @@ function play(video_id) {
         ontimeout  : function (response){ status("ontimeout", response) }
     };
 
-    GM_xmlhttpRequest(details);
+    console.log(GM_xmlhttpRequest(details));
+}
+
+
+function send(command, parameters, callback) {
+    if (!parameters) parameters = {}
+
+    var request = {
+        method : 'POST',
+        url : 'http://' + xbmc_address + '/jsonrpc',
+        headers : {'Content-Type': 'application/json'},
+        data : JSON.stringify({
+            jsonrpc: "2.0",
+            method: command,
+            params: parameters
+        }),
+        "id": 1
+    };
+    if (callback) request.onload = callback;
+
+    GM_xmlhttpRequest(request);
+}
+
+
+setTimeout(function(){ get_status() } , 20);
+
+function get_status(continue_with) {
+    if (continue_with) 
+    send("Player.GetProperties", {
+        "playerid": 1,
+        "properties": ["playlistid", "position", "speed"]
+    }, function(outside_data) {
+        return function(response) {
+            console.log(response);
+            console.log(outside_data);
+        }
+    }('something something')
+    )
+    // returns either
+    // "error": {
+    //     "code": -32100,
+    //     "message": "Failed to execute method."
+    // },
+    // or
+    // "result": {
+    //     "playlistid": 1,
+    //     "position": 0,
+    //     "speed": 1
+    // }
+}
+
+function play() {
+    get_status()
+}
+function _play(video, something) {
+
+}
+
+function video_play() {
+    // get_info;
+    // on return, batch:
+    //      insert at some position
+    //      open playlist or advance
+    //
+    // find current position, if any!
+    // send:
+    //   "Playlist.Insert",
+    //   {
+    //       "item": {
+    //           "file": $X
+    //       },
+    //       "playlistid": 1,
+    //       "position": $Y
+    //   }
+    // if not playing,
+    // Player.Open "playlistid": 1
+    // else,
+    // Player.GoNext "playerid": 1
+}
+
+function video_add() {
+    // get_info;
+    // on return open playlist or nothing
+    // 
+    // send:
+    //   "Playlist.Add",
+    //   {
+    //       "playlistid": 1
+    //       "item": {
+    //           "file": $X
+    //       }
+    //   }
+    // if not playing,
+    // Player.Open "playlistid": 1
+}
+
+function video_insert() {
+    // get_info;
+    // on return, either insert, or batch:
+    //      insert
+    //      open playlist
+    //
+    // same as play,
+    // Player.Open if not playing,
+    // else do nothing
+}
+
+function video_replace() {
+    // batch:
+    //      stop
+    //      clear playlist
+    //      insert into playlist
+    //      open playlist
+    //
+    // Playlist.Clear "playlistid": 1
+    // then all the stuff from play
 }
 
 
 /*
 Going playlisty:
+
+# xbmc() { curl -s -H 'Content-Type: application/json' -d '{"id": 1, "jsonrpc": "2.0", "method": "'"$1"'", "params": {'"$2"'}}'  http://xbmc:none@localhost:8080/jsonrpc | python -mjson.tool | pygmentize -l json; }
 
 »»»
 {
@@ -273,7 +393,8 @@ This might be needed:
 
 // part 1: are we on a listing page?
 var thumbs = document.getElementsByClassName('ux-thumb-wrap');
-if (thumbs.length) {
+// !!! forget about the old code
+if (false && thumbs.length) {
     // do the stuff
     for (var i=0, j=thumbs.length; i<j; i++) {
         var elem = thumbs[i];
@@ -357,7 +478,8 @@ if (thumbs.length) {
 
 // part 2: are we on a video page?
 var video_id = get_video_id(window.location.href);
-if (video_id) {
+// !! forget about the old code
+if (false && video_id) {
     var _empty = document.createElement('img');
     _empty.setAttribute('src', '//s.ytimg.com/yt/img/pixel.gif');
     _empty.setAttribute('class', 'yt-uix-button-icon');
@@ -413,11 +535,11 @@ GM_addStyle('\
     \
     span.xbmc-actions.small>button.xbmc-dropdown { width: 12px; } \
     span.xbmc-actions.small>button.xbmc-dropdown>span>img { width: 6px; background-position: -142px -31px; } \
+    span.xbmc-actions.small>button.xbmc-dropdown>div { left: -3px; top: 22px; Xdisplay: block; } \
     \
-    span.xbmc-actions.small>button.xbmc-dropdown>div { left: -3px; top: 22px; display: block; } \
     \
-    \
-    span.xbmc-actions.large { position: absolute; z-index: 9999; right: 100px; top: 70px; width: 82px; } \
+    span.xbmc-actions.large { width: 82px; } \
+    /* temp */ span.xbmc-actions.large { float:right; margin-top: 3px; margin-left: 10px; } \
     span.xbmc-actions.large>button>span>img { height: 15px; } \
     span.xbmc-actions.large>button.xbmc-button { width: 66px; } \
     span.xbmc-actions.large>button.xbmc-button>span { width: 64px; height: 15px; background-position: 15px 0; } \
@@ -427,8 +549,12 @@ GM_addStyle('\
     \
     span.xbmc-actions.large>button.xbmc-dropdown { width: 16px; } \
     span.xbmc-actions.large>button.xbmc-dropdown>span>img { width: 8px; background-position: -142px 0; } \
-    span.xbmc-actions.large>button.xbmc-dropdown { width: 16px; } \
-    span.xbmc-actions.large>button.xbmc-dropdown>div { left: -3px; top: 30px; display: block; } \
+    span.xbmc-actions.large>button.xbmc-dropdown>div { left: -3px; top: 30px; Xdisplay: block; } \
+\
+\
+#xbmc-menu.yt-uix-button-menu {padding: 3px 0; } \
+#xbmc-menu.yt-uix-button-menu>li.yt-uix-button-menu-item {padding: 3px 10px; } \
+\
 ');
 
 
@@ -437,7 +563,7 @@ function mkButtons(large) {
     actions.setAttribute('class', 'xbmc-actions yt-uix-button-group ' + (large ? 'large' : 'small'));
 
     var _button = document.createElement('button');
-    _button.setAttribute('class', 'xbmc-button start yt-uix-button yt-uix-button-default yt-uix-tooltip ' + (large ? 'yt-uix-button-empty yt-uix-tooltip-reverse' : 'addto-button video-actions'));
+    _button.setAttribute('class', 'xbmc-button start yt-uix-button yt-uix-button-default yt-uix-tooltip ' + (large ? 'yt-uix-button-empty' : 'addto-button video-actions'));
     _button.setAttribute('title', play_button_text);
     _button.setAttribute('type', 'button');
     _button.setAttribute('role', 'button');
@@ -460,11 +586,13 @@ function mkButtons(large) {
     _wrapper.appendChild(_empty);
 
     var _dropdown = document.createElement('button');
-    _dropdown.setAttribute('class', 'xbmc-dropdown end yt-uix-button yt-uix-button-default ' + (large ? 'yt-uix-button-empty' : 'addto-button video-actions'));
+    _dropdown.setAttribute('class', 'xbmc-dropdown end yt-uix-button yt-uix-button-default ' + (large ? 'yt-uix-button-empty' : 'addto-button video-actions')); // flip?
     _dropdown.setAttribute('type', 'button');
     _dropdown.setAttribute('role', 'button');
     _dropdown.setAttribute('onclick', ';return false;');
-    _dropdown.setAttribute('data-button-has-sibling-menu', 'true');
+    //_dropdown.setAttribute('data-button-has-sibling-menu', 'true');
+    _dropdown.setAttribute('data-button-menu-id', 'xbmc-menu');
+    _dropdown.setAttribute('aria-haspopup', 'true');
     actions.appendChild(_dropdown);
 
     var _wrapper = document.createElement('span');
@@ -474,35 +602,42 @@ function mkButtons(large) {
     var _empty = document.createElement('img');
     _empty.setAttribute('src', PIXEL_IMG);
     if (large) _empty.setAttribute('class', 'yt-uix-button-icon');
-    _wrapper.appendChild(_empty);
+    _wrapper.appendChild(_empty)
 
-    var _menuwrapper = document.createElement('div');
-    _menuwrapper.setAttribute('class', 'yt-uix-button-menu yt-uix-button-menu-default');
-    _dropdown.appendChild(_menuwrapper);
 
     var _menu = document.createElement('ul');
-    _menuwrapper.appendChild(_menu);
-
+    _menu.setAttribute('id', 'xbmc-menu');
+    _menu.setAttribute('class', 'yt-uix-button-menu yt-uix-button-menu-default');
+    _menu.setAttribute('style', 'display:none;');
+    _menu.setAttribute('role', 'menu');
+    _menu.setAttribute('aria-haspopup', 'true');
+    //_dropdown.appendChild(_menu);
+    //document.body.appendChild(_menu);
+    actions.appendChild(_menu);
+    
     // TODO: add these things dinamically
     var _item1 = document.createElement('li');
+    _item1.setAttribute('class', 'yt-uix-button-menu-item');
+    _item1.setAttribute('role', 'menuitem');
+    _item1.appendChild(document.createTextNode('menu stuff 1'));
     _menu.appendChild(_item1);
-
-    var _item1_text = document.createElement('li');
-    _item1_text.setAttribute('class', 'yt-uix-button-menu-item');
-    _item1_text.appendChild(document.createTextNode('menu stuff 1'));
-    _item1.appendChild(_item1_text);
 
     document.body.appendChild(actions);
     // this needs to be set after the element has been added to the dom
-    _dropdown.widgetMenu = _menuwrapper;
+    //_dropdown.widgetMenu = _menuwrapper;
 
     return actions;
 }
 
 setTimeout(function(){
-    var xpathExpression = '/html/body/div/div[3]/div/div[3]/div/div[2]/div[2]/div[2]/div[1]/a'
-    var elem = document.evaluate(xpathExpression, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    elem.appendChild(mkButtons(false));
-    document.body.appendChild(mkButtons(true));
+
+
+    var x = 0;
+    x = 1;
+
+
+
+    if (x) document.evaluate('/html/body/div/div[6]/div/div[2]/div/div/div[2]/div[2]/div/div/div/div/ul/li/div/div[2]/div[2]/div/div/a', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.appendChild(mkButtons(false));
+    else document.getElementById('yt-masthead-content').insertBefore(mkButtons(true), document.getElementById('masthead-upload-button-group'));
 }, 50);
 
