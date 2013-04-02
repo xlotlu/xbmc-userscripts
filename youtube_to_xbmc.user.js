@@ -10,6 +10,8 @@
 // @updateURL       http://userscripts.org/scripts/source/136934.meta.js
 // ==/UserScript==
 
+(function () {
+
 // the script will stop the currently playing video on youtube
 // when something is sent to XBMC.
 // if you don't want this behaviour, change this to false:
@@ -29,6 +31,26 @@ function modify_xbmc_address() {
 
 var play_button_id = 'xbmc-play-button';
 var play_button_text = 'Play in XBMC';
+
+var ACTIONS = {
+    add:        {
+                    action: video_add,
+                    caption: 'Enqueue'
+                },
+    play:       {
+                    action: video_play,
+                    caption: 'Play now'
+                },
+    insert:     {
+                    action: video_insert,
+                    caption: 'Play next'
+                },
+    replace:    {
+                    action: video_replace,
+                    caption: 'Replace playlist'
+                }
+}
+
 
 function stop_playing() {
     var player;
@@ -128,7 +150,7 @@ function send(command, parameters, callback) {
 }
 
 
-setTimeout(function(){ get_status() } , 20);
+//setTimeout(function(){ get_status() } , 20);
 
 function get_status(continue_with) {
     if (continue_with) 
@@ -552,18 +574,19 @@ GM_addStyle('\
     span.xbmc-actions.large>button.xbmc-dropdown>div { left: -3px; top: 30px; Xdisplay: block; } \
 \
 \
-#xbmc-menu.yt-uix-button-menu {padding: 3px 0; } \
-#xbmc-menu.yt-uix-button-menu>li.yt-uix-button-menu-item {padding: 3px 10px; } \
+    #xbmc-menu.small {top: auto !important; bottom: 22px; left: 0 !important;} \
+    #xbmc-menu.small {padding: 3px 0; } \
+    #xbmc-menu.small>li.yt-uix-button-menu-item {padding: 3px 10px; font-size: 90%;  } \
 \
 ');
 
 
 function mkButtons(large) {
     var actions = document.createElement('span');
-    actions.setAttribute('class', 'xbmc-actions yt-uix-button-group ' + (large ? 'large' : 'small'));
+    actions.setAttribute('class', 'xbmc-actions yt-uix-button-group ' + (large ? 'large' : 'video-actions small'));
 
     var _button = document.createElement('button');
-    _button.setAttribute('class', 'xbmc-button start yt-uix-button yt-uix-button-default yt-uix-tooltip ' + (large ? 'yt-uix-button-empty' : 'addto-button video-actions'));
+    _button.setAttribute('class', 'xbmc-button start yt-uix-button yt-uix-button-default yt-uix-tooltip ' + (large ? 'yt-uix-button-empty' : 'addto-button'));
     _button.setAttribute('title', play_button_text);
     _button.setAttribute('type', 'button');
     _button.setAttribute('role', 'button');
@@ -586,12 +609,12 @@ function mkButtons(large) {
     _wrapper.appendChild(_empty);
 
     var _dropdown = document.createElement('button');
-    _dropdown.setAttribute('class', 'xbmc-dropdown end yt-uix-button yt-uix-button-default ' + (large ? 'yt-uix-button-empty' : 'addto-button video-actions')); // flip?
+    _dropdown.setAttribute('class', 'xbmc-dropdown end yt-uix-button yt-uix-button-default ' + (large ? 'yt-uix-button-empty' : 'addto-button'));
     _dropdown.setAttribute('type', 'button');
     _dropdown.setAttribute('role', 'button');
     _dropdown.setAttribute('onclick', ';return false;');
-    //_dropdown.setAttribute('data-button-has-sibling-menu', 'true');
-    _dropdown.setAttribute('data-button-menu-id', 'xbmc-menu');
+    _dropdown.setAttribute('data-button-has-sibling-menu', 'true');
+    //_dropdown.setAttribute('data-button-menu-id', 'xbmc-menu');
     _dropdown.setAttribute('aria-haspopup', 'true');
     actions.appendChild(_dropdown);
 
@@ -607,24 +630,26 @@ function mkButtons(large) {
 
     var _menu = document.createElement('ul');
     _menu.setAttribute('id', 'xbmc-menu');
-    _menu.setAttribute('class', 'yt-uix-button-menu yt-uix-button-menu-default');
-    _menu.setAttribute('style', 'display:none;');
+    _menu.setAttribute('class', 'yt-uix-button-menu yt-uix-button-menu-default small'); // !! addClass('small') ...
+    _menu.setAttribute('style', 'display: none;');
     _menu.setAttribute('role', 'menu');
     _menu.setAttribute('aria-haspopup', 'true');
-    //_dropdown.appendChild(_menu);
+    _dropdown.appendChild(_menu);
     //document.body.appendChild(_menu);
-    actions.appendChild(_menu);
-    
-    // TODO: add these things dinamically
-    var _item1 = document.createElement('li');
-    _item1.setAttribute('class', 'yt-uix-button-menu-item');
-    _item1.setAttribute('role', 'menuitem');
-    _item1.appendChild(document.createTextNode('menu stuff 1'));
-    _menu.appendChild(_item1);
+    //actions.appendChild(_menu);
+
+// !!!
+delete(ACTIONS['add']);
+
+    for (var action in ACTIONS) {
+        var _item = document.createElement('li');
+        _item.setAttribute('class', 'yt-uix-button-menu-item ' + action);
+        _item.setAttribute('role', 'menuitem');
+        _item.appendChild(document.createTextNode(ACTIONS[action].caption));
+        _menu.appendChild(_item);
+    }
 
     document.body.appendChild(actions);
-    // this needs to be set after the element has been added to the dom
-    //_dropdown.widgetMenu = _menuwrapper;
 
     return actions;
 }
@@ -633,11 +658,13 @@ setTimeout(function(){
 
 
     var x = 0;
-    x = 1;
+x = 1;
 
 
 
     if (x) document.evaluate('/html/body/div/div[6]/div/div[2]/div/div/div[2]/div[2]/div/div/div/div/ul/li/div/div[2]/div[2]/div/div/a', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.appendChild(mkButtons(false));
     else document.getElementById('yt-masthead-content').insertBefore(mkButtons(true), document.getElementById('masthead-upload-button-group'));
 }, 50);
+
+})();
 
