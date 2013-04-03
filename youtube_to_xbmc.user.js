@@ -543,11 +543,16 @@ var BUTTONS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAAArCAYAAAD
 
 GM_addStyle('\
     span.xbmc-actions>button { position: static; left: auto; top: auto; right: auto; bottom: auto; } \
+    \
     span.xbmc-actions>button.xbmc-button { float: left; } \
     span.xbmc-actions>button.xbmc-dropdown { padding: 0 5px; } \
+    \
     span.xbmc-actions>button.xbmc-button>span, span.xbmc-actions>button>span>img { background-image: url("' + BUTTONS_IMG + '"); background-repeat: no-repeat; } \
     span.xbmc-actions>button.xbmc-button>span { display: block; float: left; } \
     span.xbmc-actions>button.xbmc-button>span>img { float: left; } \
+    \
+    span.xbmc-actions>ul.yt-uix-button-menu {} \
+    \
     \
     span.xbmc-actions.small { position: absolute; left: 2px; bottom: 2px; width: 70px; } \
     span.xbmc-actions.small>button>span>img { height: 11px; } \
@@ -558,6 +563,9 @@ GM_addStyle('\
     span.xbmc-actions.small>button.xbmc-dropdown { width: 12px; } \
     span.xbmc-actions.small>button.xbmc-dropdown>span>img { width: 6px; background-position: -142px -31px; } \
     span.xbmc-actions.small>button.xbmc-dropdown>div { left: -3px; top: 22px; Xdisplay: block; } \
+    \
+    span.xbmc-actions.small>ul.yt-uix-button-menu {top: auto !important; bottom: 22px; left: 0 !important; padding: 3px 0; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.yt-uix-button-menu-item {padding: 3px 10px; font-size: 90%; } \
     \
     \
     span.xbmc-actions.large { width: 82px; } \
@@ -572,12 +580,7 @@ GM_addStyle('\
     span.xbmc-actions.large>button.xbmc-dropdown { width: 16px; } \
     span.xbmc-actions.large>button.xbmc-dropdown>span>img { width: 8px; background-position: -142px 0; } \
     span.xbmc-actions.large>button.xbmc-dropdown>div { left: -3px; top: 30px; Xdisplay: block; } \
-\
-\
-    #xbmc-menu.small {top: auto !important; bottom: 22px; left: 0 !important;} \
-    #xbmc-menu.small {padding: 3px 0; } \
-    #xbmc-menu.small>li.yt-uix-button-menu-item {padding: 3px 10px; font-size: 90%;  } \
-\
+    \
 ');
 
 
@@ -614,7 +617,6 @@ function mkButtons(large) {
     _dropdown.setAttribute('role', 'button');
     _dropdown.setAttribute('onclick', ';return false;');
     _dropdown.setAttribute('data-button-has-sibling-menu', 'true');
-    //_dropdown.setAttribute('data-button-menu-id', 'xbmc-menu');
     _dropdown.setAttribute('aria-haspopup', 'true');
     actions.appendChild(_dropdown);
 
@@ -629,7 +631,6 @@ function mkButtons(large) {
 
 
     var _menu = document.createElement('ul');
-    _menu.setAttribute('id', 'xbmc-menu');
     _menu.setAttribute('class', 'yt-uix-button-menu yt-uix-button-menu-default small'); // !! addClass('small') ...
     _menu.setAttribute('style', 'display: none;');
     _menu.setAttribute('role', 'menu');
@@ -639,7 +640,7 @@ function mkButtons(large) {
     //actions.appendChild(_menu);
 
 // !!!
-delete(ACTIONS['add']);
+//delete(ACTIONS['add']);
 
     for (var action in ACTIONS) {
         var _item = document.createElement('li');
@@ -656,14 +657,10 @@ delete(ACTIONS['add']);
 
 setTimeout(function(){
 
+    var x = 3;
 
-    var x = 0;
-x = 1;
-
-
-
-    if (x) document.evaluate('/html/body/div/div[6]/div/div[2]/div/div/div[2]/div[2]/div/div/div/div/ul/li/div/div[2]/div[2]/div/div/a', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.appendChild(mkButtons(false));
-    else document.getElementById('yt-masthead-content').insertBefore(mkButtons(true), document.getElementById('masthead-upload-button-group'));
+    if (1 & x) document.getElementById('yt-masthead-content').insertBefore(mkButtons(true), document.getElementById('masthead-upload-button-group'));
+    if (2 & x) document.evaluate('/html/body/div/div[6]/div/div[2]/div/div/div[2]/div[2]/div/div/div/div/ul/li/div/div[2]/div[2]/div/div/a', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.appendChild(mkButtons(false));
 }, 50);
 
 })();
