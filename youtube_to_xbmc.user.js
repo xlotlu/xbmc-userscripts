@@ -37,19 +37,21 @@ var ACTIONS = {
                     action: video_add,
                     caption: 'Enqueue'
                 },
-    play:       {
-                    action: video_play,
-                    caption: 'Play now'
-                },
     insert:     {
                     action: video_insert,
                     caption: 'Play next'
+                },
+    play:       {
+                    action: video_play,
+                    caption: 'Play now'
                 },
     replace:    {
                     action: video_replace,
                     caption: 'Replace playlist'
                 }
-}
+};
+
+var DEFAULT_ACTION = 'add';
 
 
 function stop_playing() {
@@ -545,54 +547,89 @@ GM_addStyle('\
     span.xbmc-actions>button { position: static; left: auto; top: auto; right: auto; bottom: auto; } \
     \
     span.xbmc-actions>button.xbmc-button { float: left; } \
-    span.xbmc-actions>button.xbmc-dropdown { padding: 0 5px; } \
     \
-    span.xbmc-actions>button.xbmc-button>span, span.xbmc-actions>button>span>img { background-image: url("' + BUTTONS_IMG + '"); background-repeat: no-repeat; } \
     span.xbmc-actions>button.xbmc-button>span { display: block; float: left; } \
     span.xbmc-actions>button.xbmc-button>span>img { float: left; } \
     \
+    span.xbmc-actions>button.xbmc-dropdown { padding: 0 5px; } \
+    \
     span.xbmc-actions>ul.yt-uix-button-menu {} \
+    \
+    span.xbmc-actions>button.xbmc-button>span, span.xbmc-actions>button>span>img, span.xbmc-actions>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img { background-image: url("' + BUTTONS_IMG + '"); background-repeat: no-repeat; } \
     \
     \
     span.xbmc-actions.small { position: absolute; left: 2px; bottom: 2px; width: 70px; } \
     span.xbmc-actions.small>button>span>img { height: 11px; } \
-    span.xbmc-actions.small>button.xbmc-button { width: 58px; } \
-    span.xbmc-actions.small>button.xbmc-button>span { width: 56px; height: 11px; background-position: 13px -46px; } \
-    span.xbmc-actions.small>button.xbmc-button>span>img { width: 15px; background-position: -99px -46px; } \
     \
-    span.xbmc-actions.small>button.xbmc-dropdown { width: 12px; } \
-    span.xbmc-actions.small>button.xbmc-dropdown>span>img { width: 6px; background-position: -142px -46px; } \
-    span.xbmc-actions.small>button.xbmc-dropdown>div { left: -3px; top: 22px; Xdisplay: block; } \
+    span.xbmc-actions.small>button.xbmc-button { width: 60px; } \
+    span.xbmc-actions.small>button.xbmc-button>span { width: 56px; height: 11px; background-position: 15px -46px; } \
+    span.xbmc-actions.small>button.xbmc-button>span>img { margin-left: 2px; width: 15px; } \
+    span.xbmc-actions.small>button.xbmc-button.play>span>img { background-position: -60px -46px; } \
+    span.xbmc-actions.small>button.xbmc-button.add>span>img { background-position: -80px -46px; } \
+    span.xbmc-actions.small>button.xbmc-button.insert>span>img { background-position: -100px -46px; } \
+    span.xbmc-actions.small>button.xbmc-button.replace>span>img { background-position: -120px -46px; } \
+    \
+    span.xbmc-actions.small>button.xbmc-dropdown { width: 14px; } \
+    span.xbmc-actions.small>button.xbmc-dropdown>span>img { width: 8px; background-position: -141px -46px; } \
     \
     span.xbmc-actions.small>ul.yt-uix-button-menu {top: auto !important; bottom: 22px; left: 0 !important; padding: 3px 0; } \
-    span.xbmc-actions.small>ul.yt-uix-button-menu>li.yt-uix-button-menu-item {padding: 3px 10px; font-size: 90%; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item {padding: 3px 10px; font-size: 90%; color: #555; line-height: 13px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item:hover {color: #fff; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img {width: 15px; height: 13px; margin: 0 1px 0 -7px; vertical-align: text-bottom; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item>img {background-position: -60px -45px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item:hover>img {background-position: -60px -58px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.add>a.yt-uix-button-menu-item>img {background-position: -80px -45px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.add>a.yt-uix-button-menu-item:hover>img {background-position: -80px -58px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.insert>a.yt-uix-button-menu-item>img {background-position: -100px -45px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.insert>a.yt-uix-button-menu-item:hover>img {background-position: -100px -58px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item>img {background-position: -120px -45px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item:hover>img {background-position: -120px -58px; } \
     \
-    \
-    span.xbmc-actions.large { width: 82px; } \
-    /* temp */ span.xbmc-actions.large { float:right; margin-top: 3px; margin-left: 10px; } \
+    span.xbmc-actions.large { } \
+    /* temp */ span.xbmc-actions.large { float:left; margin-top: 3px; margin-right: 10px; } \
     span.xbmc-actions.large>button>span>img { height: 15px; } \
-    span.xbmc-actions.large>button.xbmc-button { width: 66px; } \
-    span.xbmc-actions.large>button.xbmc-button>span { width: 64px; height: 15px; background-position: 15px 0; } \
-    span.xbmc-actions.large>button.xbmc-button:hover>span { background-position: 15px -15px; } \
-    span.xbmc-actions.large>button.xbmc-button>span>img { width: 17px; background-position: -99px 0; } \
-    span.xbmc-actions.large>button.xbmc-button:hover>span>img { background-position: -99px -15px; } \
     \
-    span.xbmc-actions.large>button.xbmc-dropdown { width: 16px; } \
-    span.xbmc-actions.large>button.xbmc-dropdown>span>img { width: 8px; background-position: -142px 0; } \
-    span.xbmc-actions.large>button.xbmc-dropdown>div { left: -3px; top: 30px; Xdisplay: block; } \
+    span.xbmc-actions.large>button.xbmc-button { width: 74px; } \
+    span.xbmc-actions.large>button.xbmc-button>span { width: 72px; height: 15px; background-position: 20px 0; } \
+    span.xbmc-actions.large>button.xbmc-button:hover>span { background-position: 20px -15px; } \
+    span.xbmc-actions.large>button.xbmc-button>span>img { margin-left: 3px; width: 17px; } \
+    span.xbmc-actions.large>button.xbmc-button.play>span>img { background-position: -60px 0; } \
+    span.xbmc-actions.large>button.xbmc-button.play:hover>span>img { background-position: -60px -15px; } \
+    span.xbmc-actions.large>button.xbmc-button.add>span>img { background-position: -80px 0; } \
+    span.xbmc-actions.large>button.xbmc-button.add:hover>span>img { background-position: -80px -15px; } \
+    span.xbmc-actions.large>button.xbmc-button.insert>span>img { background-position: -100px 0; } \
+    span.xbmc-actions.large>button.xbmc-button.insert:hover>span>img { background-position: -100px -15px; } \
+    span.xbmc-actions.large>button.xbmc-button.replace>span>img { background-position: -120px 0; } \
+    span.xbmc-actions.large>button.xbmc-button.replace:hover>span>img { background-position: -120px -15px; } \
     \
+    span.xbmc-actions.large>button.xbmc-dropdown { width: 18px; } \
+    span.xbmc-actions.large>button.xbmc-dropdown>span>img { width: 10px; background-position: -141px 0; } \
+    \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item {padding: 6px 15px 5px 17px; line-height: 15px; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img {width: 17px; height: 15px; margin: 0 1px 1px -13px; vertical-align: text-bottom; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item>img {background-position: -60px 0; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item:hover>img {background-position: -60px -30px; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.add>a.yt-uix-button-menu-item>img {background-position: -80px 0; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.add>a.yt-uix-button-menu-item:hover>img {background-position: -80px -30px; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.insert>a.yt-uix-button-menu-item>img {background-position: -100px 0; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.insert>a.yt-uix-button-menu-item:hover>img {background-position: -100px -30px; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item>img {background-position: -120px 0; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item:hover>img {background-position: -120px -30px; } \
 ');
 
+var default_action = ACTIONS[DEFAULT_ACTION];
+delete(ACTIONS[DEFAULT_ACTION]);
 
 function mkButtons(large) {
     var actions = document.createElement('span');
     actions.setAttribute('class', 'xbmc-actions yt-uix-button-group ' + (large ? 'large' : 'video-actions small'));
 
     var _button = document.createElement('button');
-    _button.setAttribute('class', 'xbmc-button start yt-uix-button yt-uix-button-default yt-uix-tooltip ' + (large ? 'yt-uix-button-empty' : 'addto-button'));
-    _button.setAttribute('title', play_button_text);
+    _button.setAttribute('class', 'xbmc-button start yt-uix-button yt-uix-button-default yt-uix-tooltip ' + DEFAULT_ACTION + (large ? ' yt-uix-button-empty' : ' addto-button'));
+    _button.setAttribute('title', default_action.caption);
     _button.setAttribute('type', 'button');
     _button.setAttribute('role', 'button');
+    _button.setAttribute('onclick', ';return false;');
     actions.appendChild(_button);
 
     var _wrapper = document.createElement('span');
@@ -602,7 +639,7 @@ function mkButtons(large) {
     if (!large) {
         var _label = document.createElement('span');
         _label.setAttribute('class', 'addto-label');
-        _label.appendChild(document.createTextNode(play_button_text));
+        _label.appendChild(document.createTextNode(default_action.caption));
         _wrapper.appendChild(_label);
     }
 
@@ -644,10 +681,20 @@ function mkButtons(large) {
 
     for (var action in ACTIONS) {
         var _item = document.createElement('li');
-        _item.setAttribute('class', 'yt-uix-button-menu-item ' + action);
         _item.setAttribute('role', 'menuitem');
-        _item.appendChild(document.createTextNode(ACTIONS[action].caption));
+        _item.setAttribute('class', action);
         _menu.appendChild(_item);
+        
+        var _wrapper = document.createElement('a');
+        _wrapper.setAttribute('class', 'yt-uix-button-menu-item');
+        _wrapper.href = '#xbmc-' + action;
+        _wrapper.setAttribute('onclick', ';return false;');
+        _item.appendChild(_wrapper);
+        
+        var _empty = document.createElement('img');
+        _empty.setAttribute('src', PIXEL_IMG);
+        _wrapper.appendChild(_empty)        
+        _wrapper.appendChild(document.createTextNode(ACTIONS[action].caption));
     }
 
     document.body.appendChild(actions);
