@@ -4,7 +4,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   version="1.1"
   width="160"
-  height="43">
+  height="71">
   <defs>
     <g
       id="xbmc">
@@ -80,6 +80,28 @@
         x="140"
         xlink:href="#arrow" />
     </g>
+
+    <g
+      id="small-buttons"> 
+        <use
+          xlink:href="#xbmc" 
+          transform="scale(0.84615385)" />
+        <use
+          xlink:href="#play"
+          transform="matrix(0.84615385,0,0,0.84615385,60,0)" />
+        <use
+          xlink:href="#play-add"
+          transform="matrix(0.84615385,0,0,0.84615385,80,0)" />
+        <use
+          xlink:href="#play-insert"
+          transform="matrix(0.84615385,0,0,0.84615385,100,0)" />
+        <use
+          xlink:href="#play-replace"
+          transform="matrix(0.84615385,0,0,0.84615385,120,0)" />
+        <use
+          xlink:href="#arrow"
+          transform="matrix(0.84615385,0,0,0.84615385,140,0)" />
+    </g>
   </defs>
   <use
     xlink:href="#buttons"
@@ -89,26 +111,17 @@
     xlink:href="#buttons"
     y="16"
     style="fill: rgb(34,34,34)" />
-  <g
-    transform="translate(0,31)"
-    style="fill: rgb(119,119,119)">
-      <use
-        xlink:href="#xbmc" 
-        transform="scale(0.84615385)" />
-      <use
-        xlink:href="#play"
-        transform="matrix(0.84615385,0,0,0.84615385,60,0)" />
-      <use
-        xlink:href="#play-add"
-        transform="matrix(0.84615385,0,0,0.84615385,80,0)" />
-      <use
-        xlink:href="#play-insert"
-        transform="matrix(0.84615385,0,0,0.84615385,100,0)" />
-      <use
-        xlink:href="#play-replace"
-        transform="matrix(0.84615385,0,0,0.84615385,120,0)" />
-      <use
-        xlink:href="#arrow"
-        transform="matrix(0.84615385,0,0,0.84615385,140,0)" />
-  </g>
+  <use
+    xlink:href="#buttons"
+    y="31"
+    style="fill: rgb(255,255,255)" />
+
+  <use
+    xlink:href="#small-buttons"
+    y="46"
+    style="fill: rgb(119,119,119)" />
+  <use
+    xlink:href="#small-buttons"
+    y="59"
+    style="fill: rgb(255,255,255)" />
 </svg>
