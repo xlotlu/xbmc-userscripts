@@ -531,11 +531,6 @@ if (false && video_id) {
         GM_addStyle('#' + play_button_id + '-large { position: fixed; right: 10px; bottom: 10px; }');
     }
     container.appendChild(large_play_button);
-
-    var play_button_image_large = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAAeCAQAAADXj8WDAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AYYEwIXHEAGSAAAAAJiS0dEAP+Hj8y/AAAEBElEQVRIx+VVTWhUSRB+MuCqiYyBhcCicbo6kwQ9iiK65yy7bDZrV7/DCoEoghuiiCB7kMVDcjCX4E0wiImjDEoEL0ZIQDOoh80GMaKIB3/An2BGzMYElEHN8+t+P77MxDCiJId9xQz9VXV3VVdX1+c4S/Px+T++X3ynHk+oHV+yQnfqw1/vFKLO7qwqe8UAz7iJb+AUMq5/LbK0qRwPc0a1GOQmeLc6xVehm8bsMcgo9/JP/lw3offwOX1Fdbg1BqlWdRpru9XaIDuK+zB/jM/MdWqk101+cqq286NAn+EGLDCj93wZ/+94ClKwOfrbcZrX8W1rnWVPP9eNfC1EPKk2u5V6yOLXKqe2ljr1+GkYe3CCldzGeehn+C13cdpxdtRh435rS+pD/AauG/gWdMfceoyy/j4xdENfMmG7m+ZLbyiz/EtRmo+HJ7KoCehoZBsEOhGG4Tg7q/hDMYL86yyb/07nPalN837o8z9/F8w/ANQere4GuoNfQ6S5V4I83fy5Qiq50yDBy/k+LIXWFcH8dqAef9xSoV/gLHmejO03zv/F0ITdd1/Z1WutaRSRbz/SUhGUl8fP3B8xWm9tffj9E85vWgU0GgWcDNbedDeU9U71Nt2PijUVeFHvsnfzSl3Xe00Ps2seWN2gu8UEFLmpRGVnQ2Tv9ALfNZWiRhBeesGO9PsafohH8YQH/PvQjXoIqZxSL1tX4E12IuXT2OZPZxkKK+vnIKiADvVX7EhdfPC31dzDj22gJ5ey9/5/Pnm+bvHTSx5NyC+iNtEpDn+9UyNna8qmNhqgGSfxLZx6NE5FzYHaZE4My4yw1OYkaDedoqsyR9OYPQYZpd5U2DQTYo84R1dEB9UYJFvFaTFM3bUBtZESfZg/RmfmOjXSS7E2KLfTI18vM6kGLDDj93QZ/+9oClKwNhCBXEe3rXUW+LlopGshoknavLGShix+LXOpraVOPXqamtPw166kNspDP0NvqYvQUagOyLIIJcUhekMFBHQLumOiHqNssM8ndIMumbDlpvnSG8osFVEbHQ9PZMuoCSiiNhqE5UQYhuPUVNGHEuRRMbUtfFKb5v3Q52sDaqMD5ImI2qgbtjvkpSIyk/eKEXm1zZ8rpJI79b+Ny+k+LIVUQG2iHWcLqK26gl7gLHmKURsKMkZtNGH2FfvKrl5rTctMYD9SXRGUl0fPCNQm1hub7AOOqO2HVUARtVEyWHuzdkNZ71Ruo35UrKnAi7TL3s0rui73mh5mVzywukGxxQQU5aUSlR1Rm73TC3TXVsoIHk16wY6UWiMe4lE8oQH/PvAMhpDKKXqJNCdEJ1I+TSMEakNhZatj1CY6ZIzaUPEH61fLHnpsAz25lL138b+PxXZ8IaD1z58AAAAASUVORK5CYII=';
-
-    GM_addStyle('#' + play_button_id + '-large img { width: 58px; height: 15px; background: url("' + play_button_image_large + '") no-repeat top; }');
-    GM_addStyle('#' + play_button_id + '-large:hover img { background-position: bottom; }'); 
 }
 
 // the end
@@ -604,6 +599,7 @@ GM_addStyle('\
     \
     span.xbmc-actions.large>button.xbmc-dropdown { width: 18px; } \
     span.xbmc-actions.large>button.xbmc-dropdown>span>img { width: 10px; background-position: -141px 0; } \
+    span.xbmc-actions.large>button.xbmc-dropdown:hover>span>img { background-position: -141px -15px; } \
     \
     span.xbmc-actions.large>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item {padding: 6px 15px 5px 17px; line-height: 15px; } \
     span.xbmc-actions.large>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img {width: 17px; height: 15px; margin: 0 1px 1px -13px; vertical-align: text-bottom; } \
@@ -621,12 +617,14 @@ var default_action = ACTIONS[DEFAULT_ACTION];
 delete(ACTIONS[DEFAULT_ACTION]);
 
 function mkButtons(large) {
+    // the main container
     var actions = document.createElement('span');
     actions.setAttribute('class', 'xbmc-actions yt-uix-button-group ' + (large ? 'large' : 'video-actions small'));
 
+    // the default action
     var _button = document.createElement('button');
     _button.setAttribute('class', 'xbmc-button start yt-uix-button yt-uix-button-default yt-uix-tooltip ' + DEFAULT_ACTION + (large ? ' yt-uix-button-empty' : ' addto-button'));
-    _button.setAttribute('title', default_action.caption);
+    _button.setAttribute('title', default_action.caption + ' in XBMC');
     _button.setAttribute('type', 'button');
     _button.setAttribute('role', 'button');
     _button.setAttribute('onclick', ';return false;');
@@ -639,7 +637,7 @@ function mkButtons(large) {
     if (!large) {
         var _label = document.createElement('span');
         _label.setAttribute('class', 'addto-label');
-        _label.appendChild(document.createTextNode(default_action.caption));
+        _label.appendChild(document.createTextNode(default_action.caption + ' in XBMC'));
         _wrapper.appendChild(_label);
     }
 
@@ -648,6 +646,7 @@ function mkButtons(large) {
     if (large) _empty.setAttribute('class', 'yt-uix-button-icon');
     _wrapper.appendChild(_empty);
 
+    // the dropdown button
     var _dropdown = document.createElement('button');
     _dropdown.setAttribute('class', 'xbmc-dropdown end yt-uix-button yt-uix-button-default ' + (large ? 'yt-uix-button-empty' : 'addto-button'));
     _dropdown.setAttribute('type', 'button');
@@ -666,18 +665,13 @@ function mkButtons(large) {
     if (large) _empty.setAttribute('class', 'yt-uix-button-icon');
     _wrapper.appendChild(_empty)
 
-
+    // the dropdown menu
     var _menu = document.createElement('ul');
-    _menu.setAttribute('class', 'yt-uix-button-menu yt-uix-button-menu-default small'); // !! addClass('small') ...
+    _menu.setAttribute('class', 'yt-uix-button-menu yt-uix-button-menu-default');
     _menu.setAttribute('style', 'display: none;');
     _menu.setAttribute('role', 'menu');
     _menu.setAttribute('aria-haspopup', 'true');
     _dropdown.appendChild(_menu);
-    //document.body.appendChild(_menu);
-    //actions.appendChild(_menu);
-
-// !!!
-//delete(ACTIONS['add']);
 
     for (var action in ACTIONS) {
         var _item = document.createElement('li');
@@ -696,8 +690,6 @@ function mkButtons(large) {
         _wrapper.appendChild(_empty)        
         _wrapper.appendChild(document.createTextNode(ACTIONS[action].caption));
     }
-
-    document.body.appendChild(actions);
 
     return actions;
 }
