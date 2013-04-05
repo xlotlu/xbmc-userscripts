@@ -440,7 +440,7 @@ GM_addStyle('\
     \
     span.xbmc-actions>button.xbmc-dropdown { padding: 0 5px; } \
     \
-    span.xbmc-actions>ul.yt-uix-button-menu {} \
+    span.xbmc-actions>ul.yt-uix-button-menu { } \
     \
     span.xbmc-actions>button.xbmc-button>span, span.xbmc-actions>button>span>img, span.xbmc-actions>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img { background-image: url("' + BUTTONS_IMG + '"); background-repeat: no-repeat; } \
     \
@@ -473,8 +473,9 @@ GM_addStyle('\
     span.xbmc-actions.small>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item:hover>img {background-position: -120px -58px; } \
     \
     span.xbmc-actions.large { } \
+    span.xbmc-actions.large.fixed { position: fixed; bottom: 10px; right: 10px; z-index: 999999999; } \
+    span.xbmc-actions.large.fixed>ul.yt-uix-button-menu { bottom: 27px !important; right: 0 !important; top: auto !important; left: auto !important; } \
     span.xbmc-actions.large.inline>button { margin-top: 4px; } \
-    \
     span.xbmc-actions.large>button>span>img { height: 15px; } \
     \
     span.xbmc-actions.large>button.xbmc-button { width: 74px; } \
@@ -529,7 +530,7 @@ function mkButtons(large) {
     // doing what?
     _button._action = this.default_action.action;
     _button.addEventListener('click', function(event) {
-        this._action(this.parentNode.parentNode._video_id);
+        this._action(this.parentNode._video_id);
         event.preventDefault();
     }, false);
 
@@ -590,13 +591,13 @@ function mkButtons(large) {
         
         var _empty = document.createElement('img');
         _empty.setAttribute('src', PIXEL_IMG);
-        _action.appendChild(_empty)        
+        _action.appendChild(_empty);
         _action.appendChild(document.createTextNode(ACTIONS[action].caption));
         
         // actually doing something
         _action._action = ACTIONS[action].action;
         _action.addEventListener('click', function(event) {
-            this._action(this.parentNode.parentNode.parentNode.parentNode._video_id);
+            this._action(this.parentNode.parentNode.parentNode._video_id);
             event.preventDefault();
         }, false);
     }
@@ -609,7 +610,7 @@ function mkButtons(large) {
 
 // if on a listing page:
 var thumbs = document.getElementsByClassName('ux-thumb-wrap');
-if (thumbs.length) {
+if (thumbs.length && false) {
     var buttons = mkButtons();
     document.body.appendChild(buttons);
 
@@ -629,7 +630,7 @@ if (thumbs.length) {
             else elem = elem.parentNode;
         }
 
-        if (!link) continue; 
+        if (!link) continue;
         var href = link.getAttribute('href');
         if (!href) continue;
         var video_id = get_video_id(href);
@@ -637,15 +638,16 @@ if (thumbs.length) {
 
         // set it for later usage
         thumb._video_id = video_id;
-       
+        
         // and make the elem display the button on mouseover
         var target = link;
-        // TODO: find the real target depending on where you are around youtube 
+        // TODO: find the real target depending on where you are around youtube
         
         target._thumb = thumb;
 
         target.addEventListener('mouseenter', function() {
             this._thumb.appendChild(buttons);
+            buttons._video_id = this._thumb._video_id;
         }, false);
         target.addEventListener('mouseleave', function() {
             // place it back on body, one never knows when its ancestors go away
@@ -659,6 +661,7 @@ var video_id = get_video_id(window.location.href);
 video_id = 'test!!11';
 if (video_id) {
     var buttons = mkButtons(true);
+    buttons._video_id = video_id;
     
     var container = document.getElementById('watch7-action-buttons');
     if (container) {
@@ -670,9 +673,9 @@ if (video_id) {
         }
         container.appendChild(buttons);
     } else {
+        buttons.className = buttons.className + ' fixed';
+        buttons.children[0].className = buttons.children[0].className + ' yt-uix-tooltip-reverse';
         document.body.appendChild(buttons);
-        // and style it specially
-        //GM_addStyle('#' + play_button_id + '-large { position: fixed; right: 10px; bottom: 10px; }');
     }
 }
 
