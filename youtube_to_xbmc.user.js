@@ -7,6 +7,7 @@
 // @version         1.0.2
 // @date            2012-07-11
 // @author          xlotlu
+// @homepageURL     http://userscripts.org/scripts/show/136934
 // @updateURL       http://userscripts.org/scripts/source/136934.meta.js
 // ==/UserScript==
 
@@ -51,6 +52,14 @@ var ACTIONS = {
 };
 
 var DEFAULT_ACTION = 'add';
+
+
+// aaand making it happen...
+var thumbs = document.getElementsByClassName('ux-thumb-wrap');
+if (thumbs.length) addToThumbs(thumbs);
+
+var video_id = get_video_id(window.location.href);
+if (video_id) addToPage(video_id);
 
 
 function stop_playing() {
@@ -427,7 +436,6 @@ This might be needed:
 
 
 // the pretty stuff
-var PIXEL_IMG = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='
 var BUTTONS_IMG = 'data:image/png;base64,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';
 
 GM_addStyle('\
@@ -509,6 +517,7 @@ GM_addStyle('\
 
 // the hands on stuff
 function mkButtons(large) {
+    var PIXEL_IMG = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
     if (!this.default_action) {
         this.default_action = ACTIONS[DEFAULT_ACTION];
         delete(ACTIONS[DEFAULT_ACTION]);
@@ -606,12 +615,9 @@ function mkButtons(large) {
 }
 
 
-// aaand making it happen...
-
 // if on a listing page:
-var thumbs = document.getElementsByClassName('ux-thumb-wrap');
-if (thumbs.length && false) {
-    var buttons = mkButtons();
+function addToThumbs(thumbs) {
+    var buttons = mkButtons(false);
     document.body.appendChild(buttons);
 
     // do the stuff
@@ -657,9 +663,7 @@ if (thumbs.length && false) {
 }
 
 // if on a video page:
-var video_id = get_video_id(window.location.href);
-video_id = 'test!!11';
-if (video_id) {
+function addToPage(video_id) {
     var buttons = mkButtons(true);
     buttons._video_id = video_id;
     
