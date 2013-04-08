@@ -11,6 +11,8 @@
 // @updateURL       http://userscripts.org/scripts/source/136934.meta.js
 // ==/UserScript==
 
+/* jshint -W043 */
+
 (function () {
 
 // the script will stop the currently playing video on youtube
@@ -588,6 +590,11 @@ function mkButtons(large) {
     _menu.setAttribute('aria-haspopup', 'true');
     _dropdown.appendChild(_menu);
 
+    var clickAction = function(event) {
+        this._action(this.parentNode.parentNode.parentNode._video_id);
+        event.preventDefault();
+    };
+
     for (var action in ACTIONS) {
         var _item = document.createElement('li');
         _item.setAttribute('role', 'menuitem');
@@ -607,10 +614,7 @@ function mkButtons(large) {
         
         // actually doing something
         _action._action = ACTIONS[action].action;
-        _action.addEventListener('click', function(event) {
-            this._action(this.parentNode.parentNode.parentNode._video_id);
-            event.preventDefault();
-        }, false);
+        _action.addEventListener('click', clickAction, false);
     }
 
     return actions;
@@ -622,6 +626,19 @@ function addToThumbs(thumbs) {
     var buttons = mkButtons(false);
     document.body.appendChild(buttons);
 
+    var mouseEnterAction = function() {
+        if(hasClass(this._thumb.getElementsByClassName('video-thumb')[0], 'yt-thumb-default-120')) {
+            addClass(buttons, 'crowded');
+        }
+        buttons._video_id = this._thumb._video_id;
+        this._thumb.appendChild(buttons);
+    };
+
+    var mouseLeaveAction = function() {
+        removeClass(buttons, 'crowded');
+        document.body.appendChild(buttons);
+    };
+    
     // do the stuff
     for (var i=0, j=thumbs.length; i<j; i++) {
         var elem = thumbs[i];
@@ -653,16 +670,8 @@ function addToThumbs(thumbs) {
         
         target._thumb = thumb;
 
-        target.addEventListener('mouseenter', function() {
-            if(hasClass(this._thumb.getElementsByClassName('video-thumb')[0], 'yt-thumb-default-120'))
-                addClass(buttons, 'crowded');
-            buttons._video_id = this._thumb._video_id;
-            this._thumb.appendChild(buttons);
-        }, false);
-        target.addEventListener('mouseleave', function() {
-            removeClass(buttons, 'crowded');
-            document.body.appendChild(buttons);
-        }, false);
+        target.addEventListener('mouseenter', mouseEnterAction, false);
+        target.addEventListener('mouseleave', mouseLeaveAction, false);
     }
 }
 
