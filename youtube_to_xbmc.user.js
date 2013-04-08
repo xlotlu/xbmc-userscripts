@@ -448,7 +448,7 @@ GM_addStyle('\
     \
     span.xbmc-actions>button.xbmc-dropdown { padding: 0 5px; } \
     \
-    span.xbmc-actions>ul.yt-uix-button-menu { } \
+    span.xbmc-actions>ul.yt-uix-button-menu { text-align: left; } \
     \
     span.xbmc-actions>button.xbmc-button>span, span.xbmc-actions>button>span>img, span.xbmc-actions>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img { background-image: url("' + BUTTONS_IMG + '"); background-repeat: no-repeat; } \
     \
@@ -467,9 +467,11 @@ GM_addStyle('\
     span.xbmc-actions.small>button.xbmc-dropdown { width: 14px; } \
     span.xbmc-actions.small>button.xbmc-dropdown>span>img { width: 8px; background-position: -141px -46px; } \
     \
-    span.xbmc-actions.small>ul.yt-uix-button-menu {top: auto !important; bottom: 22px; left: 0 !important; padding: 3px 0; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu {top: auto !important; bottom: 21px; left: 0 !important; padding: 3px 0; } \
+    span.xbmc-actions.small.crowded>ul.yt-uix-button-menu { bottom: 0; padding: 2px 0; } \
+    xspan.xbmc-actions.small>ul.yt-uix-button-menu {top: 21px !important; left: 0 !important; padding: 3px 0; } \
     span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item {padding: 3px 10px; font-size: 11px; color: #555; line-height: 13px; } \
-    span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item:hover {color: #fff; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item:hover {color: #fff !important; background-color: #555 !important; } \
     span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img {width: 15px; height: 13px; margin: 0 1px 0 -7px; vertical-align: text-bottom; } \
     span.xbmc-actions.small>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item>img {background-position: -60px -45px; } \
     span.xbmc-actions.small>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item:hover>img {background-position: -60px -58px; } \
@@ -652,11 +654,13 @@ function addToThumbs(thumbs) {
         target._thumb = thumb;
 
         target.addEventListener('mouseenter', function() {
-            this._thumb.appendChild(buttons);
+            if(hasClass(this._thumb.getElementsByClassName('video-thumb')[0], 'yt-thumb-default-120'))
+                addClass(buttons, 'crowded');
             buttons._video_id = this._thumb._video_id;
+            this._thumb.appendChild(buttons);
         }, false);
         target.addEventListener('mouseleave', function() {
-            // place it back on body, one never knows when its ancestors go away
+            removeClass(buttons, 'crowded');
             document.body.appendChild(buttons);
         }, false);
     }
@@ -669,19 +673,37 @@ function addToPage(video_id) {
     
     var container = document.getElementById('watch7-action-buttons');
     if (container) {
-        buttons.className = buttons.className + ' inline';
+        addClass(buttons, 'inline');
         var elems = buttons.childNodes;
         for (var i=0, j=elems.length; i<j; i++) {
-            elems[i].className = elems[i].className.replace('yt-uix-button-default', 'yt-uix-button-text');
-
+            removeClass(elems[i], 'yt-uix-button-default');
+            addClass(elems[i], 'yt-uix-button-text');
         }
         container.appendChild(buttons);
     } else {
-        buttons.className = buttons.className + ' fixed';
-        buttons.children[0].className = buttons.children[0].className + ' yt-uix-tooltip-reverse';
+        addClass(buttons, 'fixed');
+        addClass(buttons.children[0], 'yt-uix-tooltip-reverse');
         document.body.appendChild(buttons);
     }
 }
+
+
+//utils
+
+function hasClass(obj, cls) {
+    var re = new RegExp('\\b' + cls + '\\b');
+    return (obj.className.search(re) != -1);
+}
+
+function addClass(obj, cls) {
+    if (!hasClass(obj, cls)) obj.className = obj.className + ' ' + cls;
+}
+
+function removeClass(obj, cls) {
+    var re = new RegExp('\\b' + cls + '\\b');
+    obj.className.replace(re, '');
+}
+
 
 })();
 
