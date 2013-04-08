@@ -147,24 +147,6 @@ function play(video_id) {
 }
 
 
-function send(command, parameters, callback) {
-    if (!parameters) parameters = {}
-
-    var request = {
-        method : 'POST',
-        url : 'http://' + xbmc_address + '/jsonrpc',
-        headers : {'Content-Type': 'application/json'},
-        data : JSON.stringify({
-            jsonrpc: "2.0",
-            method: command,
-            params: parameters
-        }),
-        "id": 1
-    };
-    if (callback) request.onload = callback;
-
-    GM_xmlhttpRequest(request);
-}
 
 
 //setTimeout(function(){ get_status() } , 20);
@@ -265,6 +247,70 @@ function video_replace(video_id) {
     // then all the stuff from play
 }
 
+
+function XBMCClient(commands) {
+    this.commands = commands;
+}
+
+xbmc_address = 'xbmc:none@localhost:8080';
+
+XBMCClient.prototype = {
+    run: function(response) {
+        if (response !== undefined) {
+            //todo: ... something
+            //console.log(response); // !!
+
+            if (response.status != 200) {
+                return;
+            }
+            
+            var data = JSON.parse(response.responseText);
+            
+            if (data.error !== undefined) {
+                console.log('error:', data.error.message); // !!
+                return;
+            }
+
+            console.log('result:', data.result); // !!
+        }
+
+        if (this.commands.length == 0) {
+            // we're done
+            return;
+        }
+
+        var command = this.commands.shift();
+        this.send(command[0], command[1], this.run.bind(this));
+    },
+
+    send: function(command, parameters, callback) {
+        if (!parameters) parameters = {}
+
+        var request = {
+            method : 'POST',
+            url : 'http://' + xbmc_address + '/jsonrpc',
+            headers : {'Content-Type': 'application/json'},
+            data : JSON.stringify({
+                "id": 1,
+                jsonrpc: "2.0",
+                method: command,
+                params: parameters
+            })
+        };
+        if (callback) request.onload = callback;
+
+        GM_xmlhttpRequest(request);
+    },
+}
+
+var cmds = [
+    ["Player.GetActivePlayers"],
+    ["Player.Open", {"item": {"playlistid": 1}}],
+    ['method x', 'argument y']
+];
+var x = new XBMCClient(cmds);
+
+unsafeWindow.x = x; 
 
 /*
 Going playlisty:
