@@ -254,11 +254,24 @@ function XBMCClient(commands) {
 
 xbmc_address = 'xbmc:none@localhost:8080';
 
+XBMCClient.mkrequest = function(command) {
+    var method = command[0];
+    var params = command[1];
+    if (params === undefined) params = {};
+    return {
+        "id": ++XBMCClient.mkrequest._id,
+        "jsonrpc": "2.0",
+        "method": method,
+        "params": params
+    };
+};
+XBMCClient.mkrequest._id = 0;
+
 XBMCClient.prototype = {
     run: function(response) {
         if (response !== undefined) {
             //todo: ... something
-            //console.log(response); // !!
+            console.log(response); // !!
 
             if (response.status != 200) {
                 return;
@@ -274,34 +287,44 @@ XBMCClient.prototype = {
             console.log('result:', data.result); // !!
         }
 
-        if (this.commands.length == 0) {
+        if (this.commands.length === 0) {
             // we're done
             return;
         }
+
+        this.send_batch(this.commands.splice(0), this.run.bind(this));
+        return;
 
         var command = this.commands.shift();
         this.send(command[0], command[1], this.run.bind(this));
     },
 
-    send: function(command, parameters, callback) {
-        if (!parameters) parameters = {}
+    send: function(method, params, callback) {
+        if (typeof method == 'object') {
+            // method is a command (array), callback = params
+            this._send(XBMCClient.mkrequest(method), params);
+        } else {
+            this._send(XBMCClient.mkrequest([method, params]), callback);
+        }
+    },
+    
+    send_batch: function(commands, callback) {
+        this._send(commands.map(XBMCClient.mkrequest), callback);
+    },
 
+    _send: function(content, callback) {
+        console.log(content);
         var request = {
             method : 'POST',
             url : 'http://' + xbmc_address + '/jsonrpc',
             headers : {'Content-Type': 'application/json'},
-            data : JSON.stringify({
-                "id": 1,
-                jsonrpc: "2.0",
-                method: command,
-                params: parameters
-            })
+            data : JSON.stringify(content)
         };
         if (callback) request.onload = callback;
 
         GM_xmlhttpRequest(request);
-    },
-}
+    }
+};
 
 var cmds = [
     ["Player.GetActivePlayers"],
