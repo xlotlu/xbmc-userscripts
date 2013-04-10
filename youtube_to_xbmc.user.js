@@ -245,7 +245,12 @@ XBMCClient.mkrequest = function(command) {
 };
 XBMCClient.mkrequest._id = 0;
 
-XBMCClient.PLAYLIST_ID = 0; // 1 !!!
+XBMCClient.PLAYLIST_ID = 1;
+XBMCClient.PLAYER_ID = 1;
+
+XBMCClient.youtube_url = function(video_id) {
+    return 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + video_id;
+}
 
 XBMCClient.prototype = {
     run: function(response) {
@@ -308,7 +313,8 @@ XBMCClient.prototype = {
     get_info: function(callback) {
         var c = [
             //["Player.GetActivePlayers"],
-            ["Player.GetProperties", {playerid: 0, properties: ["playlistid", "position", "speed"]}],
+            // playerid: 1 -- video player
+            ["Player.GetProperties", {playerid: XBMCClient.PLAYER_ID, properties: ["playlistid", "position", "speed"]}],
             ["Playlist.GetProperties", {playlistid: XBMCClient.PLAYLIST_ID, properties: ["size"]}]
         ];
         this.send_batch(c, this.parse_info.bind(this, callback));
@@ -320,7 +326,7 @@ XBMCClient.prototype = {
 
         var status = {
             playing: false,
-            position: 0,
+            position: -1,
             total: 0
         };
 
@@ -348,22 +354,30 @@ XBMCClient.prototype = {
         console.log('..from:', this);
     },
 
-    play: function(video_id) {
-        this.get_info(this._play.bind(this, video_id))
+    play: function(url) {
+        this.get_info(this._play.bind(this, url));
     },
 
-    _play: function(video_id, status) {
-        var c = []; //commands
+    _play: function(url, status) {
+        // insert new video into playlist at current position + 1;
+        // if already playing, advance, else open playlist
 
-        console.log(video_id, status);
-        return;
-
-        c[c.length] = ["Playlist.Insert", pos];
-
-        // possibly
-        c[c.length] = ["Player.Open", {item: {playlistid: 1}}];
-        // or
-        c[c.length] = ["Player.GoTo", {playerid: 0, to: "next"}];
+        var c = [
+            ["Playlist.Insert", {
+                playlistid: XBMCClient.PLAYLIST_ID,
+                position: status.position + 1,
+                item: {file: url}
+            }]
+        ];
+        
+        if (status.playing) { 
+            c[c.length] = ["Player.GoTo", {playerid: XBMCClient.PLAYER_ID, to: "next"}];
+        } else {
+            c[c.length] = ["Player.Open", {item: {
+                playlistid: XBMCClient.PLAYLIST_ID,
+                position: status.position + 1
+            }}];
+        }
 
         this.send_batch(c);
     },
