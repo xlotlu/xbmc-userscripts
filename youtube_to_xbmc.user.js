@@ -44,7 +44,7 @@ var ACTIONS = {
                     caption: 'Play next'
                 },
     play:       {
-                    action: video_play,
+                    action: "video_play",
                     caption: 'Play now'
                 },
     replace:    {
@@ -183,28 +183,6 @@ function _play(video, something) {
 
 }
 
-function video_play(video_id) {
-    console.log("play", video_id);
-    // get_info;
-    // on return, batch:
-    //      insert at some position
-    //      open playlist or advance
-    //
-    // find current position, if any!
-    // send:
-    //   "Playlist.Insert",
-    //   {
-    //       "item": {
-    //           "file": $X
-    //       },
-    //       "playlistid": 1,
-    //       "position": $Y
-    //   }
-    // if not playing,
-    // Player.Open "playlistid": 1
-    // else,
-    // Player.GoNext "playerid": 1
-}
 
 function video_add(video_id) {
     console.log("add", video_id);
@@ -267,6 +245,8 @@ XBMCClient.mkrequest = function(command) {
 };
 XBMCClient.mkrequest._id = 0;
 
+XBMCClient.PLAYLIST_ID = 0; // 1 !!!
+
 XBMCClient.prototype = {
     run: function(response) {
         if (response !== undefined) {
@@ -313,7 +293,7 @@ XBMCClient.prototype = {
     },
 
     _send: function(content, callback) {
-        console.log(content);
+        // console.log('sending:', content);
         var request = {
             method : 'POST',
             url : 'http://' + xbmc_address + '/jsonrpc',
@@ -323,6 +303,92 @@ XBMCClient.prototype = {
         if (callback) request.onload = callback;
 
         GM_xmlhttpRequest(request);
+    },
+
+    get_info: function(callback) {
+        var c = [
+            //["Player.GetActivePlayers"],
+            ["Player.GetProperties", {playerid: 0, properties: ["playlistid", "position", "speed"]}],
+            ["Playlist.GetProperties", {playlistid: XBMCClient.PLAYLIST_ID, properties: ["size"]}]
+        ];
+        this.send_batch(c, this.parse_info.bind(this, callback));
+    },
+
+    parse_info: function(callback, response) {
+        if (typeof callback != 'function') return;
+        if (response.status != 200) return;
+
+        var status = {
+            playing: false,
+            position: 0,
+            total: 0
+        };
+
+        var data = JSON.parse(response.responseText);
+        //var active_players = data.shift();
+        var player_properties = data.shift();
+        var playlist_properties = data.shift();
+         
+        if (player_properties.error === undefined) {
+            if (player_properties.result.playlistid == XBMCClient.PLAYLIST_ID) {
+                // TODO: detect when it's paused as opposed to stopped...
+                // ... and act accordingly.
+                status.playing = Boolean(player_properties.result.speed);
+                status.position = player_properties.result.position;
+            }
+        }
+
+        status.total = playlist_properties.result.size;
+
+        callback(status);
+    },
+
+    log: function(what) {
+        console.log('uselessly logging:', what);
+        console.log('..from:', this);
+    },
+
+    play: function(video_id) {
+        this.get_info(this._play.bind(this, video_id))
+    },
+
+    _play: function(video_id, status) {
+        var c = []; //commands
+
+        console.log(video_id, status);
+        return;
+
+        c[c.length] = ["Playlist.Insert", pos];
+
+        // possibly
+        c[c.length] = ["Player.Open", {item: {playlistid: 1}}];
+        // or
+        c[c.length] = ["Player.GoTo", {playerid: 0, to: "next"}];
+
+        this.send_batch(c);
+    },
+
+    video_play: function(video_id) {
+        console.log("play", video_id);
+        // get_info;
+        // on return, batch:
+        //      insert at some position
+        //      open playlist or advance
+        //
+        // find current position, if any!
+        // send:
+        //   "Playlist.Insert",
+        //   {
+        //       "item": {
+        //           "file": $X
+        //       },
+        //       "playlistid": 1,
+        //       "position": $Y
+        //   }
+        // if not playing,
+        // Player.Open "playlistid": 1
+        // else,
+        // Player.GoNext "playerid": 1
     }
 };
 
