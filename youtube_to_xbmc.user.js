@@ -36,11 +36,11 @@ var BUTTON_ID = 'xbmc-actions';
 
 var ACTIONS = {
     add:        {
-                    action: video_add,
+                    action: "video_add",
                     caption: 'Enqueue'
                 },
     insert:     {
-                    action: video_insert,
+                    action: "video_insert",
                     caption: 'Play next'
                 },
     play:       {
@@ -48,7 +48,7 @@ var ACTIONS = {
                     caption: 'Play now'
                 },
     replace:    {
-                    action: video_replace,
+                    action: "video_replace",
                     caption: 'Replace playlist'
                 }
 };
@@ -183,47 +183,6 @@ function _play(video, something) {
 
 }
 
-
-function video_add(video_id) {
-    console.log("add", video_id);
-    // get_info;
-    // on return open playlist or nothing
-    // 
-    // send:
-    //   "Playlist.Add",
-    //   {
-    //       "playlistid": 1
-    //       "item": {
-    //           "file": $X
-    //       }
-    //   }
-    // if not playing,
-    // Player.Open "playlistid": 1
-}
-
-function video_insert(video_id) {
-    console.log("insert", video_id);
-    // get_info;
-    // on return, either insert, or batch:
-    //      insert
-    //      open playlist
-    //
-    // same as play,
-    // Player.Open if not playing,
-    // else do nothing
-}
-
-function video_replace(video_id) {
-    console.log("replace", video_id);
-    // batch:
-    //      stop
-    //      clear playlist
-    //      insert into playlist
-    //      open playlist
-    //
-    // Playlist.Clear "playlistid": 1
-    // then all the stuff from play
-}
 
 
 function XBMCClient(commands) {
@@ -360,7 +319,70 @@ XBMCClient.prototype = {
 
     _play: function(url, status) {
         // insert new video into playlist at current position + 1;
-        // if already playing, advance, else open playlist
+        // if already playing, advance, else open playlist.
+
+        var c = [
+            ["Playlist.Insert", {
+                playlistid: XBMCClient.PLAYLIST_ID,
+                position: status.position + 1,
+                item: {
+                    file: url
+                }
+            }]
+        ];
+        
+        if (status.playing) { 
+            c[c.length] = ["Player.GoTo", {
+                playerid: XBMCClient.PLAYER_ID,
+                to: "next"
+            }];
+        } else {
+            c[c.length] = ["Player.Open", {
+                item: {
+                    playlistid: XBMCClient.PLAYLIST_ID,
+                    position: status.position + 1
+                }
+            }];
+        }
+
+        this.send_batch(c);
+    },
+
+    add: function(url) {
+        this.get_info(this._add.bind(this, url));
+    },
+    
+    _add: function(url, status) {
+        // add to playlist;
+        // if not playing, play. // TODO: maybe it's a bad idea?
+        
+        var c = [
+            ["Playlist.Add", {
+                playlistid: XBMCClient.PLAYLIST_ID,
+                item: {
+                    file: url
+                }
+            }]
+        ];
+        
+        if (!status.playing) { 
+            c[c.length] = ["Player.Open", {
+                item: {
+                    playlistid: XBMCClient.PLAYLIST_ID
+                }
+            }];
+        }
+
+        this.send_batch(c);
+    },
+
+    insert: function(url) {
+        this.get_info(this._insert.bind(this, url));
+    },
+
+    _insert: function(url, status) {
+        // insert into playlist at position +1;
+        // if not playing, play. // TODO: the same..
 
         var c = [
             ["Playlist.Insert", {
@@ -369,40 +391,40 @@ XBMCClient.prototype = {
                 item: {file: url}
             }]
         ];
-        
-        if (status.playing) { 
-            c[c.length] = ["Player.GoTo", {playerid: XBMCClient.PLAYER_ID, to: "next"}];
-        } else {
-            c[c.length] = ["Player.Open", {item: {
-                playlistid: XBMCClient.PLAYLIST_ID,
-                position: status.position + 1
-            }}];
-        }
 
+        if (!status.playing) { 
+            c[c.length] = ["Player.Open", {
+                item: {
+                    playlistid: XBMCClient.PLAYLIST_ID
+                }
+            }];
+        }
+        
         this.send_batch(c);
     },
 
-    video_play: function(video_id) {
-        console.log("play", video_id);
-        // get_info;
-        // on return, batch:
-        //      insert at some position
-        //      open playlist or advance
-        //
-        // find current position, if any!
-        // send:
-        //   "Playlist.Insert",
-        //   {
-        //       "item": {
-        //           "file": $X
-        //       },
-        //       "playlistid": 1,
-        //       "position": $Y
-        //   }
-        // if not playing,
-        // Player.Open "playlistid": 1
-        // else,
-        // Player.GoNext "playerid": 1
+    replace: function(url) {
+        // clear playlist; add; play.
+        // this one needs no wrapping.
+        
+        var c = [
+            ["Playlist.Clear", {
+                playlistid: XBMCClient.PLAYLIST_ID
+            }],
+            ["Playlist.Add", {
+                playlistid: XBMCClient.PLAYLIST_ID,
+                item: {
+                    file: url
+                }
+            }],
+            ["Player.Open", {
+                item: {
+                    playlistid: XBMCClient.PLAYLIST_ID
+                }
+            }]
+        ];
+        
+        this.send_batch(c);
     }
 };
 
