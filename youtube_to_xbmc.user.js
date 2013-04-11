@@ -11,28 +11,9 @@
 // @updateURL       http://userscripts.org/scripts/source/136934.meta.js
 // ==/UserScript==
 
-/* jshint -W043 */
 
 (function () {
 
-// the script will stop the currently playing video on youtube
-// when something is sent to XBMC.
-// if you don't want this behaviour, change this to false:
-var stop_on_play = true;
-
-var xbmc_address = GM_getValue('XBMC_ADDRESS');
-GM_registerMenuCommand('Modify the XBMC address', modify_xbmc_address);
-if (xbmc_address === undefined) modify_xbmc_address();
-
-function modify_xbmc_address() {
-	xbmc_address = window.prompt(
-        'Enter the address for the XBMC web interface\n(username:password@address:port)',
-        xbmc_address
-    );
-	GM_setValue("XBMC_ADDRESS", xbmc_address);
-}
-
-var BUTTON_ID = 'xbmc-actions';
 
 var ACTIONS = {
     add:        {
@@ -53,16 +34,21 @@ var ACTIONS = {
                 }
 };
 
-var DEFAULT_ACTION = 'add';
+var DEFAULT_ACTION = 'add'; // TODO: make this customisable
 
 
-var thumbs = document.getElementsByClassName('ux-thumb-wrap');
-if (thumbs.length) addToThumbs(thumbs);
-
-var video_id = get_video_id(window.location.href);
-if (video_id) addToPage(video_id);
+var xbmc_address = GM_getValue('XBMC_ADDRESS');
+GM_registerMenuCommand('Modify the XBMC address', modify_xbmc_address);
+if (xbmc_address === undefined) modify_xbmc_address();
 
 
+function modify_xbmc_address() {
+	xbmc_address = window.prompt(
+        'Enter the address for the XBMC web interface\n(username:password@address:port)',
+        xbmc_address
+    );
+	GM_setValue("XBMC_ADDRESS", xbmc_address);
+}
 
 function get_video_id(url) {
     var match = url.match(/\bv=([\w-]+)/);
@@ -72,6 +58,7 @@ function get_video_id(url) {
 function xbmc_youtube_url(video_id) {
     return 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + video_id;
 }
+
 
 function XBMCClient(server) {
     this.server = server;
@@ -159,12 +146,8 @@ XBMCClient.prototype = {
         callback(status);
     },
 
-    log: function(what) {
-        console.log('uselessly logging:', what);
-        console.log('..from:', this);
-    },
-
     play: function(url) {
+        console.log(this, url);
         this.get_info(this._play.bind(this, url));
     },
 
@@ -533,6 +516,19 @@ GM_addStyle('\
     span.xbmc-actions.large>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item:hover>img {background-position: -120px -30px; } \
 ');
 
+
+// we'll be using this globally:
+var xbmc_client = new XBMCClient(xbmc_address);
+
+// if we're on a listing page:
+var thumbs = document.getElementsByClassName('ux-thumb-wrap');
+if (thumbs.length) addToThumbs(thumbs);
+
+// if on a video page:
+var video_id = get_video_id(window.location.href);
+if (video_id) addToPage(video_id);
+
+
 // the hands on stuff
 function mkButtons(large) {
     var PIXEL_IMG = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
@@ -555,9 +551,9 @@ function mkButtons(large) {
     actions.appendChild(_button);
 
     // doing what?
-    _button._action = this.default_action.action;
+    _button._action = xbmc_client[this.default_action.action];
     _button.addEventListener('click', function(event) {
-        this._action(this.parentNode._video_id);
+        this._action.bind(xbmc_client)(xbmc_youtube_url(this.parentNode._video_id));
         event.preventDefault();
     }, false);
 
@@ -605,7 +601,7 @@ function mkButtons(large) {
     _dropdown.appendChild(_menu);
 
     var clickAction = function(event) {
-        this._action(this.parentNode.parentNode.parentNode._video_id);
+        this._action.bind(xbmc_client)(xbmc_youtube_url(this.parentNode.parentNode.parentNode._video_id));
         event.preventDefault();
     };
 
@@ -627,7 +623,7 @@ function mkButtons(large) {
         _action.appendChild(document.createTextNode(ACTIONS[action].caption));
         
         // actually doing something
-        _action._action = ACTIONS[action].action;
+        _action._action = xbmc_client[ACTIONS[action].action];
         _action.addEventListener('click', clickAction, false);
     }
 
@@ -635,7 +631,6 @@ function mkButtons(large) {
 }
 
 
-// if on a listing page:
 function addToThumbs(thumbs) {
     var buttons = mkButtons(false);
     document.body.appendChild(buttons);
@@ -689,7 +684,6 @@ function addToThumbs(thumbs) {
     }
 }
 
-// if on a video page:
 function addToPage(video_id) {
     var buttons = mkButtons(true);
     buttons._video_id = video_id;
@@ -729,4 +723,6 @@ function removeClass(obj, cls) {
 
 
 })();
+
+/* jshint -W043 */
 
