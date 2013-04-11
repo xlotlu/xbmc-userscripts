@@ -36,19 +36,19 @@ var BUTTON_ID = 'xbmc-actions';
 
 var ACTIONS = {
     add:        {
-                    action: "video_add",
+                    action: "add",
                     caption: 'Enqueue'
                 },
     insert:     {
-                    action: "video_insert",
+                    action: "insert",
                     caption: 'Play next'
                 },
     play:       {
-                    action: "video_play",
+                    action: "play",
                     caption: 'Play now'
                 },
     replace:    {
-                    action: "video_replace",
+                    action: "replace",
                     caption: 'Replace playlist'
                 }
 };
@@ -56,7 +56,6 @@ var ACTIONS = {
 var DEFAULT_ACTION = 'add';
 
 
-// aaand making it happen...
 var thumbs = document.getElementsByClassName('ux-thumb-wrap');
 if (thumbs.length) addToThumbs(thumbs);
 
@@ -64,132 +63,19 @@ var video_id = get_video_id(window.location.href);
 if (video_id) addToPage(video_id);
 
 
-function stop_playing() {
-    var player;
-    try {
-        player = unsafeWindow.yt.player.playerReferences_.player1.api;
-    } catch(err) {
-        return;
-    }
-
-    if (player && player.stopVideo) player.stopVideo();
-}
 
 function get_video_id(url) {
     var match = url.match(/\bv=([\w-]+)/);
     return match ? match[1] : null;
 }
 
-var debug = true;
-function status(type, response) {
-    if (debug) {
-        console.log(type, JSON.parse(response.responseText));
-    }
+function xbmc_youtube_url(video_id) {
+    return 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + video_id;
 }
 
-function play(video_id) {
-    console.log('playing', video_id);
-    return;
-
-
-
-    var url = 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + video_id;
-
-    var command =  {
-        jsonrpc: "2.0",
-        method: "Player.Open",
-        params: {
-            item: {
-                file: url
-            }
-        },
-        id : 1
-    };
-    /*
-    var command = [{
-        jsonrpc: "2.0",
-        method: "Playlist.Add",
-        params: {
-            item: {
-                file: url
-            },
-            playlistid: 1
-        },
-        id: 1
-    },
-    {
-        jsonrpc: "2.0",
-        method: "Player.Open",
-        params: {
-            item: {
-                playlistid: 1,
-                position: 0
-            }
-        },
-        id : 2
-    }];
-    */
-
-    var details = {
-        method : 'POST',
-        url : 'http://' + xbmc_address + '/jsonrpc',
-        headers : {'Content-Type': 'application/json'},
-        data : JSON.stringify(command),
-        onabort : function (response){ status("onabort", response) },
-        onerror : function (response){ status("onerror", response) },
-        onload : function (response){ status("onload", response) },
-        onprogress : function (response){ status("onprogress", response) },
-        onreadystatechange : function (response){ status("onreadystatechange", response) },
-        ontimeout  : function (response){ status("ontimeout", response) }
-    };
-
-    console.log(GM_xmlhttpRequest(details));
+function XBMCClient(server) {
+    this.server = server;
 }
-
-
-
-
-//setTimeout(function(){ get_status() } , 20);
-
-function get_status(continue_with) {
-    if (continue_with) 
-    send("Player.GetProperties", {
-        "playerid": 1,
-        "properties": ["playlistid", "position", "speed"]
-    }, function(outside_data) {
-        return function(response) {
-            console.log(response);
-            console.log(outside_data);
-        }
-    }('something something')
-    )
-    // returns either
-    // "error": {
-    //     "code": -32100,
-    //     "message": "Failed to execute method."
-    // },
-    // or
-    // "result": {
-    //     "playlistid": 1,
-    //     "position": 0,
-    //     "speed": 1
-    // }
-}
-
-function play() {
-    get_status()
-}
-function _play(video, something) {
-
-}
-
-
-
-function XBMCClient(commands) {
-    this.commands = commands;
-}
-
-xbmc_address = 'xbmc:none@localhost:8080';
 
 XBMCClient.mkrequest = function(command) {
     var method = command[0];
@@ -207,42 +93,7 @@ XBMCClient.mkrequest._id = 0;
 XBMCClient.PLAYLIST_ID = 1;
 XBMCClient.PLAYER_ID = 1;
 
-XBMCClient.youtube_url = function(video_id) {
-    return 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + video_id;
-}
-
 XBMCClient.prototype = {
-    run: function(response) {
-        if (response !== undefined) {
-            //todo: ... something
-            console.log(response); // !!
-
-            if (response.status != 200) {
-                return;
-            }
-            
-            var data = JSON.parse(response.responseText);
-            
-            if (data.error !== undefined) {
-                console.log('error:', data.error.message); // !!
-                return;
-            }
-
-            console.log('result:', data.result); // !!
-        }
-
-        if (this.commands.length === 0) {
-            // we're done
-            return;
-        }
-
-        this.send_batch(this.commands.splice(0), this.run.bind(this));
-        return;
-
-        var command = this.commands.shift();
-        this.send(command[0], command[1], this.run.bind(this));
-    },
-
     send: function(method, params, callback) {
         if (typeof method == 'object') {
             // method is a command (array), callback = params
@@ -260,7 +111,7 @@ XBMCClient.prototype = {
         // console.log('sending:', content);
         var request = {
             method : 'POST',
-            url : 'http://' + xbmc_address + '/jsonrpc',
+            url : 'http://' + this.server + '/jsonrpc',
             headers : {'Content-Type': 'application/json'},
             data : JSON.stringify(content)
         };
@@ -428,14 +279,6 @@ XBMCClient.prototype = {
     }
 };
 
-var cmds = [
-    ["Player.GetActivePlayers"],
-    ["Player.Open", {"item": {"playlistid": 1}}],
-    ['method x', 'argument y']
-];
-var x = new XBMCClient(cmds);
-
-unsafeWindow.x = x; 
 
 /*
 Going playlisty:
