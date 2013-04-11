@@ -1,0 +1,76 @@
+    span.xbmc-actions>button { position: static; left: auto; top: auto; right: auto; bottom: auto; } \
+    \
+    span.xbmc-actions>button.xbmc-button { float: left; } \
+    \
+    span.xbmc-actions>button.xbmc-button>span { display: block; float: left; } \
+    span.xbmc-actions>button.xbmc-button>span>img { float: left; } \
+    \
+    span.xbmc-actions>button.xbmc-dropdown { padding: 0 5px; } \
+    \
+    span.xbmc-actions>ul.yt-uix-button-menu { text-align: left; } \
+    \
+    span.xbmc-actions>button.xbmc-button>span, span.xbmc-actions>button>span>img, span.xbmc-actions>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img { background-image: url("' + BUTTONS_IMG + '"); background-repeat: no-repeat; } \
+    \
+    \
+    span.xbmc-actions.small { position: absolute; left: 2px; bottom: 2px; width: 70px; } \
+    span.xbmc-actions.small>button>span>img { height: 11px; } \
+    \
+    span.xbmc-actions.small>button.xbmc-button { width: 60px; } \
+    span.xbmc-actions.small>button.xbmc-button>span { width: 56px; height: 11px; background-position: 15px -46px; } \
+    span.xbmc-actions.small>button.xbmc-button>span>img { margin-left: 2px; width: 15px; } \
+    span.xbmc-actions.small>button.xbmc-button.play>span>img { background-position: -60px -46px; } \
+    span.xbmc-actions.small>button.xbmc-button.add>span>img { background-position: -80px -46px; } \
+    span.xbmc-actions.small>button.xbmc-button.insert>span>img { background-position: -100px -46px; } \
+    span.xbmc-actions.small>button.xbmc-button.replace>span>img { background-position: -120px -46px; } \
+    \
+    span.xbmc-actions.small>button.xbmc-dropdown { width: 14px; } \
+    span.xbmc-actions.small>button.xbmc-dropdown>span>img { width: 8px; background-position: -141px -46px; } \
+    \
+    span.xbmc-actions.small>ul.yt-uix-button-menu {top: auto !important; bottom: 21px; left: 0 !important; padding: 3px 0; } \
+    span.xbmc-actions.small.crowded>ul.yt-uix-button-menu { bottom: 0; padding: 2px 0; } \
+    xspan.xbmc-actions.small>ul.yt-uix-button-menu {top: 21px !important; left: 0 !important; padding: 3px 0; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item {padding: 3px 10px; font-size: 11px; color: #555; line-height: 13px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item:hover {color: #fff !important; background-color: #555 !important; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img {width: 15px; height: 13px; margin: 0 1px 0 -7px; vertical-align: text-bottom; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item>img {background-position: -60px -45px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item:hover>img {background-position: -60px -58px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.add>a.yt-uix-button-menu-item>img {background-position: -80px -45px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.add>a.yt-uix-button-menu-item:hover>img {background-position: -80px -58px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.insert>a.yt-uix-button-menu-item>img {background-position: -100px -45px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.insert>a.yt-uix-button-menu-item:hover>img {background-position: -100px -58px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item>img {background-position: -120px -45px; } \
+    span.xbmc-actions.small>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item:hover>img {background-position: -120px -58px; } \
+    \
+    span.xbmc-actions.large { } \
+    span.xbmc-actions.large.fixed { position: fixed; bottom: 10px; right: 10px; z-index: 999999999; } \
+    span.xbmc-actions.large.fixed>ul.yt-uix-button-menu { bottom: 27px !important; right: 0 !important; top: auto !important; left: auto !important; } \
+    span.xbmc-actions.large.inline>button { margin-top: 4px; } \
+    span.xbmc-actions.large>button>span>img { height: 15px; } \
+    \
+    span.xbmc-actions.large>button.xbmc-button { width: 74px; } \
+    span.xbmc-actions.large>button.xbmc-button>span { width: 72px; height: 15px; background-position: 20px 0; } \
+    span.xbmc-actions.large>button.xbmc-button:hover>span { background-position: 20px -15px; } \
+    span.xbmc-actions.large>button.xbmc-button>span>img { margin-left: 3px; width: 17px; } \
+    span.xbmc-actions.large>button.xbmc-button.play>span>img { background-position: -60px 0; } \
+    span.xbmc-actions.large>button.xbmc-button.play:hover>span>img { background-position: -60px -15px; } \
+    span.xbmc-actions.large>button.xbmc-button.add>span>img { background-position: -80px 0; } \
+    span.xbmc-actions.large>button.xbmc-button.add:hover>span>img { background-position: -80px -15px; } \
+    span.xbmc-actions.large>button.xbmc-button.insert>span>img { background-position: -100px 0; } \
+    span.xbmc-actions.large>button.xbmc-button.insert:hover>span>img { background-position: -100px -15px; } \
+    span.xbmc-actions.large>button.xbmc-button.replace>span>img { background-position: -120px 0; } \
+    span.xbmc-actions.large>button.xbmc-button.replace:hover>span>img { background-position: -120px -15px; } \
+    \
+    span.xbmc-actions.large>button.xbmc-dropdown { width: 18px; } \
+    span.xbmc-actions.large>button.xbmc-dropdown>span>img { width: 10px; background-position: -141px 0; } \
+    span.xbmc-actions.large>button.xbmc-dropdown:hover>span>img { background-position: -141px -15px; } \
+    \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item {padding: 6px 15px 5px 17px; line-height: 15px; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li>a.yt-uix-button-menu-item>img {width: 17px; height: 15px; margin: 0 1px 1px -13px; vertical-align: text-bottom; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item>img {background-position: -60px 0; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.play>a.yt-uix-button-menu-item:hover>img {background-position: -60px -30px; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.add>a.yt-uix-button-menu-item>img {background-position: -80px 0; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.add>a.yt-uix-button-menu-item:hover>img {background-position: -80px -30px; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.insert>a.yt-uix-button-menu-item>img {background-position: -100px 0; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.insert>a.yt-uix-button-menu-item:hover>img {background-position: -100px -30px; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item>img {background-position: -120px 0; } \
+    span.xbmc-actions.large>ul.yt-uix-button-menu>li.replace>a.yt-uix-button-menu-item:hover>img {background-position: -120px -30px; } \
