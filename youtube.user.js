@@ -191,7 +191,10 @@ function addToThumbs(thumbs) {
     document.body.appendChild(buttons);
 
     var mouseEnterAction = function() {
-        if(hasClass(this._thumb.getElementsByClassName('video-thumb')[0], 'yt-thumb-default-120')) {
+        if(hasClass(
+            this._thumb.getElementsByClassName('video-thumb')[0],
+            'yt-thumb-120|yt-thumb-default-120')
+        ) {
             addClass(buttons, 'crowded');
         }
         buttons._video_id = this._thumb._video_id;
