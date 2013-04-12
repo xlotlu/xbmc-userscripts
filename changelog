@@ -1,3 +1,8 @@
+# 2.0
+* Using the XBMC video playlist.
+* Supports multiple actions.
+* XBMC RPC code and CSS stored externally.
+
 # 1.0.2
 * Fix bug when a listing contains other things besides video thumbs.
 
