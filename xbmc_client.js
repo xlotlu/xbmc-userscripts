@@ -33,7 +33,6 @@ XBMCClient.prototype = {
     },
 
     _send: function(content, callback) {
-        // console.log('sending:', content);
         var request = {
             method : 'POST',
             url : 'http://' + this.server + '/jsonrpc',
@@ -85,7 +84,6 @@ XBMCClient.prototype = {
     },
 
     play: function(url) {
-        console.log(this, url);
         this.get_info(this._play.bind(this, url));
     },
 

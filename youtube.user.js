@@ -38,18 +38,40 @@ var ACTIONS = {
 
 var DEFAULT_ACTION = 'add'; // TODO: make this customisable
 
-
-var xbmc_address = GM_getValue('XBMC_ADDRESS');
 GM_registerMenuCommand('Modify the XBMC address', modify_xbmc_address);
-if (xbmc_address === undefined) modify_xbmc_address();
+
+var xbmc_client;
+
+// if we're on a listing page:
+var thumbs = document.getElementsByClassName('ux-thumb-wrap');
+// if on a video page:
+var video_id = get_video_id(window.location.href);
+
+if (thumbs.length || video_id) {
+    eval(GM_getResourceText("client-lib-2.0"));
+    
+    var xbmc_address = GM_getValue("XBMC_ADDRESS");
+    if (xbmc_address === undefined) xbmc_address = modify_xbmc_address();
+
+    xbmc_client = new XBMCClient(xbmc_address);
+
+    GM_addStyle(GM_getResourceText("stylesheet-2.0"));
+}
+
+if (thumbs.length) addToThumbs(thumbs);
+if (video_id) addToPage(video_id);
 
 
 function modify_xbmc_address() {
-	xbmc_address = window.prompt(
-        'Enter the address for the XBMC web interface\n(username:password@address:port)',
-        xbmc_address
+	var xbmc_address = window.prompt(
+        'Enter the address of the XBMC web interface:\n(username:password@hostname:port)',
+        GM_getValue("XBMC_ADDRESS") || "user:pass@localhost:8080"
     );
 	GM_setValue("XBMC_ADDRESS", xbmc_address);
+
+    if (xbmc_client !== undefined) xbmc_client = new XBMCClient(xbmc_address);
+
+    return xbmc_address;
 }
 
 function get_video_id(url) {
@@ -60,24 +82,6 @@ function get_video_id(url) {
 function xbmc_youtube_url(video_id) {
     return 'plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + video_id;
 }
-
-
-eval(GM_getResourceText("client-lib-2.0"));
-
-// the pretty stuff
-GM_addStyle(GM_getResourceText("stylesheet-2.0"));
-
-
-// we'll be using this globally:
-var xbmc_client = new XBMCClient(xbmc_address);
-
-// if we're on a listing page:
-var thumbs = document.getElementsByClassName('ux-thumb-wrap');
-if (thumbs.length) addToThumbs(thumbs);
-
-// if on a video page:
-var video_id = get_video_id(window.location.href);
-if (video_id) addToPage(video_id);
 
 
 // the hands on stuff
