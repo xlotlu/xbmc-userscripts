@@ -9,6 +9,8 @@
 // @author          xlotlu
 // @homepageURL     http://userscripts.org/scripts/show/136934
 // @updateURL       http://userscripts.org/scripts/source/136934.meta.js
+// @resource        client-lib-2.0 http://xlotlu.github.io/xbmc-userscripts/xbmc_client.js
+// @resource        stylesheet-2.0 http://xlotlu.github.io/xbmc-userscripts/resources/youtube.css
 // ==/UserScript==
 
 
@@ -60,9 +62,11 @@ function xbmc_youtube_url(video_id) {
 }
 
 
+eval(GM_getResourceText("client-lib-2.0"));
 
 // the pretty stuff
-GM_addStyle('');
+GM_addStyle(GM_getResourceText("stylesheet-2.0"));
+
 
 // we'll be using this globally:
 var xbmc_client = new XBMCClient(xbmc_address);
@@ -137,7 +141,7 @@ function mkButtons(large) {
     var _empty = document.createElement('img');
     _empty.setAttribute('src', PIXEL_IMG);
     if (large) _empty.setAttribute('class', 'yt-uix-button-icon');
-    _wrapper.appendChild(_empty)
+    _wrapper.appendChild(_empty);
 
     // the dropdown menu
     var _menu = document.createElement('ul');
@@ -271,5 +275,4 @@ function removeClass(obj, cls) {
 
 })();
 
-/* jshint -W043 */
 
