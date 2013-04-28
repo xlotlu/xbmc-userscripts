@@ -195,9 +195,10 @@ function addToThumbs(thumbs) {
     document.body.appendChild(buttons);
 
     var mouseEnterAction = function() {
+        // TODO: find a smarter way to figure this out
         if(hasClass(
             this._thumb.getElementsByClassName('video-thumb')[0],
-            'yt-thumb-120|yt-thumb-default-120')
+            'yt-thumb-120|yt-thumb-default-120|yt-thumb-128')
         ) {
             addClass(buttons, 'crowded');
         }
@@ -280,7 +281,7 @@ function addClass(obj, cls) {
 
 function removeClass(obj, cls) {
     var re = new RegExp('\\b' + cls + '\\b');
-    obj.className.replace(re, '');
+    obj.className = obj.className.replace(re, '');
 }
 
 
