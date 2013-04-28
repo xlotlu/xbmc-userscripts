@@ -7,7 +7,8 @@
 // @date            2013-04-28
 // @author          xlotlu
 // @homepageURL     http://userscripts.org/scripts/show/136934
-// @updateURL       http://userscripts.org/scripts/source/136934.meta.js
+// @updateURL       https://userscripts.org/scripts/source/136934.meta.js
+// @downloadURL     https://userscripts.org/scripts/source/136934.user.js
 // @resource        client-lib-2.0 http://xlotlu.github.io/xbmc-userscripts/xbmc_client.js
 // @resource        stylesheet-2.0 http://xlotlu.github.io/xbmc-userscripts/resources/youtube.css
 // @grant           GM_getValue
