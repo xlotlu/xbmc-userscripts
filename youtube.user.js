@@ -2,7 +2,7 @@
 // @name            YouTube » XBMC
 // @namespace       http://userscripts.org/users/53793/scripts
 // @description     Play YouTube videos on your XBMC
-// @include         *youtube.tld/*
+// @include         http*://www.youtube.com/*
 // @version         2.0
 // @date            2013-04-12
 // @author          xlotlu
@@ -10,6 +10,11 @@
 // @updateURL       http://userscripts.org/scripts/source/136934.meta.js
 // @resource        client-lib-2.0 http://xlotlu.github.io/xbmc-userscripts/xbmc_client.js
 // @resource        stylesheet-2.0 http://xlotlu.github.io/xbmc-userscripts/resources/youtube.css
+// @grant           GM_getValue
+// @grant           GM_setValue
+// @grant           GM_getResourceText
+// @grant           GM_addStyle
+// @grant           GM_registerMenuCommand
 // ==/UserScript==
 
 
