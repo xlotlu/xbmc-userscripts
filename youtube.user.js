@@ -16,6 +16,7 @@
 // @grant           GM_getResourceText
 // @grant           GM_addStyle
 // @grant           GM_registerMenuCommand
+// @grant           GM_xmlhttpRequest
 // ==/UserScript==
 
 
