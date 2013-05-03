@@ -3,8 +3,8 @@
 // @namespace       http://userscripts.org/users/53793/scripts
 // @description     Play YouTube videos on your XBMC
 // @include         http*://www.youtube.com/*
-// @version         2.0.1
-// @date            2013-04-28
+// @version         2.0.2
+// @date            2013-05-03
 // @author          xlotlu
 // @homepageURL     http://userscripts.org/scripts/show/136934
 // @updateURL       https://userscripts.org/scripts/source/136934.meta.js
